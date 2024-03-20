@@ -61,43 +61,14 @@
                             @if ($catalog->image == null)
                             No Uploaded Image Found
                             @else
-                            <button type="button" class="btn btn-outline-primary btn-sm mb-1">
-                                @php
-                                $extension = pathinfo($catalog->image, PATHINFO_EXTENSION);
-                                $iconClass = '';
-
-                                switch ($extension) {
-                                case 'pdf':
-                                $iconClass = 'bi-file-earmark-pdf';
-                                break;
-                                case 'doc':
-                                case 'docx':
-                                $iconClass = 'bi-file-earmark-word';
-                                break;
-                                case 'xls':
-                                case 'xlsx':
-                                $iconClass = 'bi-file-earmark-excel';
-                                break;
-                                case 'jpg':
-                                case 'jpeg':
-                                case 'png':
-                                $iconClass = 'bi-file-earmark-image';
-                                break;
-                                // Add more cases for other file extensions as needed
-                                default:
-                                $iconClass = 'bi-file-earmark';
-                                break;
-                                }
-                                @endphp
-                                <i class="bi {{ $iconClass }} mr-1" onclick="window.open('{{ asset('storage').'/'.$catalog->image }}', '_blank')"></i>
-                            </button>
+                            <img src="{{ asset('storage').'/'.$catalog->image }}" height="50" width="70">
                             @endif
                         </div>
                     </div>
                 </div>
             </div>
             <div class="card-title">
-                <h4>Related History</h4>
+                <h4>Product Sales History</h4>
             </div>
             <div class="card">
 
@@ -213,7 +184,6 @@
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                            <button type="submit" class="btn btn-default">Save</button>
                         </div>
 
                     </div>

@@ -1,5 +1,6 @@
 @extends('layouts.app')
 @section('title', 'Users')
+@section('sub-title', 'Users')
 @section('content')
 <section class="section dashboard">
     <div class="row">
@@ -241,6 +242,11 @@
             $('.alert-danger').html('');
             // $('.alert-danger').show();   
             $('#first_name').val('');
+            $('#last_name').val('');
+            $('#email').val('');
+            $('#phone').val('');
+            $('#password').val('');
+            $('#password_confirmation').val('');
             $('#addUsers').modal('show');
     }
 

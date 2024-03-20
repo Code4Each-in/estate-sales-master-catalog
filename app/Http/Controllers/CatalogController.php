@@ -261,13 +261,10 @@ class CatalogController extends Controller
 
     private function getProducts($id = null)
     {
-        $consumerKey = env('CONSUMER_KEY');
-        $consumerSecret = env('CONSUMER_SECRET');
         $apiUrl = rtrim(env('WORDPRESS_URL'), '/') . '/wp-json/custom/v3/products-by-meta';
     
         try {
-            $response = Http::withBasicAuth($consumerKey, $consumerSecret)
-                ->withoutVerifying()
+            $response = Http::withoutVerifying()
                 ->get($apiUrl, ['cat_id' => $id]);
     
             // Check if the request was successful

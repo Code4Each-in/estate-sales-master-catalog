@@ -1316,3 +1316,24 @@ header .header-alert{
   color: #231911;
   /* background-color: #231911; */
 }
+
+#loader {
+  display: none;
+  position:fixed;
+  z-index:99999;
+  top:0;
+  left:0;
+  bottom:0;
+  right:0;
+  background:rgba(0,0,0,70%);
+  transition: 1s 0.4s;
+}
+.loader-spinner{
+
+  width: 65px;
+  height: 65px;
+  position: absolute;
+  top: 40%;
+  left: 45%;
+
+}
