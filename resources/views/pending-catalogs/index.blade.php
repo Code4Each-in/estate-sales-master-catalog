@@ -1,6 +1,6 @@
 @extends('layouts.app')
-@section('title', 'Catalog')
-@section('sub-title', 'Catalog')
+@section('title', 'Pending Catalog')
+@section('sub-title', 'Pending Catalog')
 @section('content')
 <div id="loader">
    
@@ -14,7 +14,7 @@
         <div class="col-lg-12">
             <div class="card">
                 <div class="card-body">
-                    <button class="btn btn-default my-3" onClick="openCatalogModal()" href="javascript:void(0)">Add Catalog</button>
+                    <!-- <button class="btn btn-default my-3" onClick="openPendingCatalogModal()" href="javascript:void(0)">Add Pending Catalog</button> -->
                     <!-- <h5 class="card-title">Table with stripped rows</h5> -->
                     <br>
 
@@ -26,6 +26,7 @@
                                     <tr>
                                         <th scope="col">#</th>
                                         <th scope="col">Title</th>
+                                        <th scope="col">Catalog Id</th>
                                         <th scope="col">Base Price</th>
                                         <th scope="col">SKU</th>
                                         <th scope="col">Publish Date</th>
@@ -39,6 +40,7 @@
                                     <tr>
                                         <th scope="row">{{ $index + 1 }}</th>
                                         <td>{{ucfirst($data->title) ?? ''}}</td>
+                                        <td>{{$data->catalog_id ?? 'Null'}}</td>
                                         <td>${{$data->base_price ?? ''}}</td>
                                         <td>{{$data->sku ?? 'NA'}}</td>
                                         <td>{{$data->publish_date ?? 'NA'}}</td>
@@ -57,13 +59,11 @@
                                             @endif
                                         </td>
                                         <td>
-                                            <i onClick="editCatalogs('{{ $data->id }}')" href="javascript:void(0)" class="fa fa-edit fa-fw pointer btn-fa-catalog"></i>
+                                            <!-- <i onClick="editCatalogs('{{ $data->id }}')" href="javascript:void(0)" class="fa fa-edit fa-fw pointer btn-fa-catalog"></i> -->
 
-                                            {{-- <i onClick="deleteCatalogs('{{ $data->id }}')" href="javascript:void(0)" class="fa fa-trash fa-fw pointer btn-fa-catalog"></i> --}}
+                                            <!-- <i onClick="deleteModal('{{ $data->id }}')" href="javascript:void(0)" class="fa fa-trash fa-fw pointer btn-fa-catalog"></i> -->
 
-                                            <i onClick="deleteModal('{{ $data->id }}')" href="javascript:void(0)" class="fa fa-trash fa-fw pointer btn-fa-catalog"></i>
-
-                                            <a href="{{ url('/catalog/'.$data->id)}}" class="btn btn-default-border">Show Products</a>
+                                             <a onClick="editCatalogs('{{ $data->id }}')" href="javascript:void(0)" class="btn btn-default-border">Approve</a> 
                                         </td>
                                     </tr>
                                     @endforeach
@@ -74,15 +74,15 @@
                     <!-- End Table with stripped rows -->
 
 
-                    <!--start: Add users Modal -->
+                    <!--start: Add Pending Catalog Modal -->
                     <div class="modal fade" id="addCatalog" tabindex="-1" aria-labelledby="role" aria-hidden="true">
                         <div class="modal-dialog modal-lg">
                             <div class="modal-content">
                                 <div class="modal-header">
-                                    <h5 class="modal-title" id="role">Add Catalog</h5>
+                                    <h5 class="modal-title" id="role">Add Pending Catalog</h5>
                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
-                                <form id="addCatalogsForm">
+                                <form id="addPendingCatalogsForm">
                                     @csrf
                                     <div class="modal-body">
                                         <div class="alert alert-danger" style="display:none"></div>
@@ -144,7 +144,7 @@
                                             <div class="col-sm-9">
                                                 <select name="status" class="form-select" id="status">
                                                     <option value="draft">Draft</option>
-                                                    <option value="publish">Publish</option>
+                                                    <!-- <option value="publish">Publish</option> -->
                                                 </select>
                                             </div>
                                         </div>
@@ -158,7 +158,7 @@
                         </div>
                     </div>
                 </div>
-                <!--end: Add User Modal -->
+                <!--end: Add Pending Catalog Modal -->
 
 
 
@@ -167,10 +167,10 @@
                     <div class="modal-dialog modal-lg">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h5 class="modal-title" id="role">Edit Catalog</h5>
+                                <h5 class="modal-title" id="role">Edit Pending Catalog</h5>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
-                            <form id="editCatalogsForm">
+                            <form id="editPendingCatalogsForm">
                                 @csrf
                                 <div class=" modal-body">
                                     <div class="alert alert-danger" style="display:none"></div>
@@ -227,7 +227,7 @@
                                                 <input type="date" class="form-control" name="date" id="date">
                                             </div>
                                         </div> -->
-                                    <div class="row mb-3">
+                                    <!-- <div class="row mb-3">
                                         <label for="edit_status" class="col-sm-3 col-form-label required">Status</label>
                                         <div class="col-sm-9">
                                             <select name="status" class="form-select" id="edit_status">
@@ -235,12 +235,12 @@
                                                 <option value="publish">Publish</option>
                                             </select>
                                         </div>
-                                    </div>
-                                    <input type="hidden" class="form-control" name="users_id" id="catalog_id" value="">
+                                    </div> -->
+                                    <input type="hidden" class="form-control" name="pending_catalog_id" id="catalog_id" value="">
                                 </div>
                                 <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                    <button type="submit" class="btn btn-default">Save</button>
+                                    <button type="submit" name="decline" class="btn btn-secondary" >Decline</button>
+                                    <button type="submit" class="btn btn-default">Publish</button>
                                 </div>
                             </form>
                         </div>
@@ -251,17 +251,17 @@
 
 
             <!--start: Delete Modal -->
-            <div class="modal fade" id="deleteCatalog" tabindex="-1" aria-labelledby="role" aria-hidden="true">
+            <div class="modal fade" id="deletePendingCatalog" tabindex="-1" aria-labelledby="role" aria-hidden="true">
                 <div class="modal-dialog modal-lg">
                     <div class="modal-content">
                         <div class="modal-header">
-                            <h5 class="modal-title" id="role">Delete Catalog</h5>
+                            <h5 class="modal-title" id="role">Delete Pending Catalog</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                         </div>
                         <div class="modal-body">
-                            <form id="deleteCatalogsForm">
+                            <form id="deletePendingCatalogsForm">
                                     <input type="hidden" name="id" id="id">                        
-                                        <p>Are You Sure You Want To Delete Catalog?</p>
+                                        <p>Are You Sure You Want To Delete Catalog From Pending List?</p>
                                         <button type="submit" class="btn btn-default">Yes</button>
                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>         
                             </form>
@@ -271,6 +271,29 @@
             </div>
         </div>
         <!--end: Delete Modal -->
+
+        <!--start: Publish Pending Catalog Modal -->
+        <div class="modal fade" id="publishPendingCatalog" tabindex="-1" aria-labelledby="role" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="role">Publish Catalog</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="publishPendingCatalogForm">
+                                @csrf
+                                    <input type="hidden" name="id" id="id">                        
+                                        <p>Do You Want To Publish This Catelog.</p>
+                                        <button type="submit" class="btn btn-default">Approve</button>
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>         
+                            </form>
+                        </div>
+                    </div>
+                </div>  
+            </div>
+        </div>
+        <!--end: Publish Pending Catalog Modal -->
 
     </div>
     </div>
@@ -301,7 +324,7 @@
     });
 
 
-    function openCatalogModal() {
+    function openPendingCatalogModal() {
         //fetch category on modal open
         fetchCategories();
         $('.alert-danger').html('');
@@ -314,7 +337,7 @@
         $('#addCatalog').modal('show');
     }
 
-    $('#addCatalogsForm').submit(function(event) {
+    $('#addPendingCatalogsForm').submit(function(event) {
         event.preventDefault();
         var formData = new FormData(this);
         if ($('#image')[0].files.length > 0) {
@@ -323,7 +346,7 @@
         }
         $.ajax({
             type: 'POST',
-            url: "{{ url('/catalogs/add')}}",
+            url: "{{ url('/pending-catalogs/add/')}}",
             data: formData,
             cache: false,
             processData: false,
@@ -386,7 +409,7 @@
         $('#catalog_id').val(id);
         $.ajax({
             type: "GET",
-            url: "{{ url('/catalogs/edit') }}" + '/' + id,
+            url: "{{ url('/pending-catalogs/edit') }}" + '/' + id,
             dataType: 'json',
             success: (res) => {
                 if (res.catalogs != null) {
@@ -396,19 +419,29 @@
                     $('#edit_content').val(res.catalogs.content);
                     $('#edit_sku').val(res.catalogs.sku);
                     $('#edit_base_price').val(res.catalogs.base_price);
-                    $('#edit_status option[value="' + res.catalogs.status + '"]').attr('selected',
-                        'selected');
+                    // $('#edit_status option[value="' + res.catalogs.status + '"]').attr('selected',
+                    //     'selected');
                 }
             }
         });
     }
 
 
-    $('#editCatalogsForm').submit(function(event) {
+    $('#editPendingCatalogsForm').submit(function(event) {
         id = $('#catalog_id').val();
         event.preventDefault();
+        
+         // Determine the action based on the button clicked
+        var status;
+        if ($(event.originalEvent.submitter).attr('name') === 'decline') {
+            status = 'decline';
+        } else {
+            status = 'publish';
+        }
+    console.log(status);
         // var imageFile = $('#edit_image')[0].files[0];
         var formData = new FormData(this);
+        formData.append('status', status);
         // Check if an image file is selected
         if ($('#edit_image')[0].files.length > 0) {
             var imageFile = $('#edit_image')[0].files[0];
@@ -417,7 +450,7 @@
         // formData.append('image',imageFile);
         $.ajax({
             type: "POST",
-            url: `{{ route('catalogs.update', ['catalog' => ':id']) }}`.replace(':id', id),
+            url: `{{ route('pending-catalogs.update', ['catalog' => ':id']) }}`.replace(':id', id),
             data: formData,
             dataType: 'json',
             processData: false,
@@ -439,13 +472,13 @@
     });
 
 
-    $('#deleteCatalogsForm').submit(function(event) {
+    $('#deletePendingCatalogsForm').submit(function(event) {
         id = $('#id').val();
         event.preventDefault();
         var token = $('meta[name="csrf-token"]').attr('content');
         $.ajax({
                 type: "DELETE",
-                url: `{{ route('catalogs.destroy', ['catalog' => ':id']) }}`.replace(':id', id),
+                url: `{{ route('pending-catalogs.destroy', ['catalog' => ':id']) }}`.replace(':id', id),
                 data: {
                     _token: token,
                     id: id
@@ -462,39 +495,93 @@
 
 
     function deleteModal(id) {
-        $('#deleteCatalog').modal('show');
+        $('#deletePendingCatalog').modal('show');
         $('#id').val(id);
     }
+    
 
-    // function deleteCatalogs(id) {
-    //     console.log(id);
-    //     if (confirm("Are you sure You Want To Delete Catalog ?")) {
-    //         var token = $('meta[name="csrf-token"]').attr('content'); // Retrieve CSRF token from meta tag
+    $('#publishPendingCatalogForm').submit(function(event) {
+        id = $('#id').val();
+        // console.log(id);
+        event.preventDefault();
+        var formData = new FormData(this);
+        formData.set('id',id);
+        var token = $('meta[name="csrf-token"]').attr('content');
+        // Display the key/value pairs
+        // for (var pair of formData.entries()) {
+        //     console.log(pair[0]+ ', ' + pair[1]); ßß
+        // }
+        $.ajax({
+        type: "POST",
+        url: "{{ route('pending-catalogs.publish') }}",
+        // url: `{{ route('catalogs.update', ['catalog' => ':id']) }}`.replace(':id', id),
 
-    //         $.ajax({
-    //             type: "DELETE",
-    //             url: `{{ route('catalogs.destroy', ['catalog' => ':id']) }}`.replace(':id', id),
-    //             data: {
-    //                 _token: token, // Include CSRF token in the request data
-    //                 id: id
-    //             },
-    //             dataType: 'json',
-    //             success: function(res) {
-    //                 location.reload();
-    //             },
-    //             error: function(xhr, status, error) {
-    //                 // Handle errors
-    //             }
-    //         });
-    //     }
-    // }
+        data: formData,
+        processData: false,
+        contentType: false,
+        headers: {
+            'X-CSRF-TOKEN': token
+        },
+        success: function(res) {
+            console.log(res);
+            if (res.errors) {
+                $('.alert-danger').html('');
+                $.each(res.errors, function(key, value) {
+                    $('.alert-danger').show();
+                    $('.alert-danger').append('<li>' + value + '</li>');
+                });
+            } else {
+                $('.alert-danger').html('');
+                $("#editCatalogs").modal('hide');
+                // Optionally, you can reload the page or perform any other action
+                // location.reload();
+            }
+        },
+        error: function(xhr, textStatus, errorThrown) {
+            // This function is called when the AJAX request encounters an error
+            console.error(xhr.status); 
+            console.error(textStatus);
+            console.error(errorThrown);  
+
+            // Optionally, you can display a generic error message to the user
+            $('.alert-danger').html('An error occurred. Please try again.');
+            $('.alert-danger').show();
+        }
+    });
+    });
+
+      function publishCatalog(id) {
+        console.log(id);    
+        $('#publishPendingCatalog').modal('show');    
+        $('#id').val(id);
+
+            // var token = $('meta[name="csrf-token"]').attr('content'); // Retrieve CSRF token from meta tag
+
+            // $.ajax({
+            //     type: "POST",
+            //     url: "{{ route('pending-catalogs.publish') }}",
+            //     data: {
+            //         _token: token, // Include CSRF token in the request data
+            //         id: id
+            //     },
+            //     dataType: 'json',
+            //     success: function(res) {
+            //         location.reload();
+            //     },
+            //     error: function(xhr, status, error) {
+            //         // Handle errors
+            //     }
+            // });
+    }
 
     // Function to fetch categories using Axios
-    function fetchCategories() {
+    function fetchCategories() { 
+        // console.log("here");
         axios.get('/fetch-catalog-categories')
             .then(function(response) {
                 // Handle the response data
                 var categories = response.data;
+                // console.log(categories) 
                 // Populate the select element with the received categories
                 $('#category').empty(); // Clear existing options
                 $('#category').append($('<option>').text('Select Category').val('')); // Add default option
