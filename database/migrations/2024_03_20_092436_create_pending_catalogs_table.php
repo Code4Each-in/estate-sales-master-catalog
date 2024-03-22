@@ -14,20 +14,18 @@ return new class extends Migration
         Schema::create('pending_catalogs', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('author_id')->constraint()->nullable();
-            $table->unsignedBigInteger('master_catalog_id')->nullable();
+            $table->bigInteger('master_catalog_id')->nullable()->constrained();
             $table->bigInteger('wp_category_id')->nullable();
             $table->string('title')->nullable();
             $table->string('name')->nullable();
             $table->string('sku')->nullable();
-            $table->double('base_price', 8, 2);
+            $table->double('base_price', 8, 2)->nullable();
             $table->string('image')->nullable();
             $table->text('content')->nullable();
             $table->string('status');
             $table->date('publish_date')->nullable();
             $table->softDeletes();
             $table->timestamps();
-
-            $table->foreign('master_catalog_id')->references('id')->on('catalogs')->onDelete('cascade');
         });
     }
 
