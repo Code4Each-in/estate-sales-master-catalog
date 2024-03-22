@@ -21,17 +21,10 @@ class PendingCatalogController extends Controller
 
           //Create User
                 $pendingCatalog = PendingCatalog::create([
-                    // 'author_id' => auth()->user()->id,
-                    // 'name' => $validatedData['title'],
                     'title' => $validatedData['title'],
                     'content' => $validatedData['content'],
-                    'wp_category_id' => $validatedData['category'] ?? null,
-                    'sku' => $validatedData['sku'] ?? null,
-                    'base_price' => $validatedData['base_price'],
                     'status' => 'draft',
                     'publish_date' => null,
-                    'created_at' => now(),
-                    'updated_at' => now(),
                 ]);
         
                 //Only if Needs to update the preview image then this will update the image
