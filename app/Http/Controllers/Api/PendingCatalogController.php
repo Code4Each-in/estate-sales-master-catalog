@@ -29,22 +29,23 @@ class PendingCatalogController extends Controller
                 ]);
         
                 //Only if Needs to update the preview image then this will update the image
-                if ($request->hasFile('image')) {
-                    //Delete The Old Stored Image in path And Upload New
-                        $uploadedFile = $request->file('image');
-                        $filename = time() . '_' . $uploadedFile->getClientOriginalName();
-                        $uploadedFile->storeAs('public/Catalogs', $filename);
-                        $path = 'Catalogs/' . $filename;
-                        PendingCatalog::where('id', $pendingCatalog->id)->update(['image' => $path]);
+                // if ($request->hasFile('image')) {
+                //     //Delete The Old Stored Image in path And Upload New
+                //         $uploadedFile = $request->file('image');
+                //         $filename = time() . '_' . $uploadedFile->getClientOriginalName();
+                //         $uploadedFile->storeAs('public/Catalogs', $filename);
+                //         $path = 'Catalogs/' . $filename;
+                //         PendingCatalog::where('id', $pendingCatalog->id)->update(['image' => $path]);
         
-                }
+                // }
                 if($pendingCatalog){
                     $response = [
                         'success' => true,
                         'status' => 201,
-                        'message' => 'Catalog Added In Pending List.'
+                        'message' => 'Catalog Added In Pending List.',
+                        'data' => ['pending_catalog_id' =>  $pendingCatalog->id ],
                     ];
-                }
+                }                
     
         return response()->json($response);
     }
