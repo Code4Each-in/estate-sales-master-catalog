@@ -163,7 +163,7 @@
 
 
                 <!--start: Edit users Modal -->
-                <div class="modal fade" id="editCatalogs" tabindex="-1" aria-labelledby="role" aria-hidden="true">
+                <div class="modal fade" id="editCatalogs" tabindex="-1" aria-labelledby="role" aria-hidden="true" style="overflow:hidden;">
                     <div class="modal-dialog modal-lg">
                         <div class="modal-content">
                             <div class="modal-header">
@@ -172,7 +172,7 @@
                             </div>
                             <form id="editCatalogsForm">
                                 @csrf
-                                <div class=" modal-body">
+                                <div class="modal-body">
                                     <div class="alert alert-danger" style="display:none"></div>
                                     <div class="row mb-3 mt-4">
                                         <label for="edit_title" class="col-sm-3 col-form-label required">Title</label>
@@ -298,7 +298,7 @@
         $('#edit_category').select2({
             dropdownParent: $('#editCatalogs')
         });
-    });
+            });
 
 
     function openCatalogModal() {
@@ -381,7 +381,7 @@
     function editCatalogs(id) {
         $('#loader').show(); 
         //fetch category on modal open
-        fetchCategoriesForEdit();
+fetchCategoriesForEdit();
         $('.alert-danger').html('');
         $('#catalog_id').val(id);
         $.ajax({
@@ -398,6 +398,8 @@
                     $('#edit_base_price').val(res.catalogs.base_price);
                     $('#edit_status option[value="' + res.catalogs.status + '"]').attr('selected',
                         'selected');
+                    $("#edit_category").select2('val',res.catalogs.wp_category_id);
+                    // $('#edit_category').select2().val(225).trigger('change');
                 }
             }
         });

@@ -8,6 +8,7 @@ use App\Http\Requests\UpdatePendingCatalog;
 use App\Models\Catalog;
 use App\Models\PendingCatalog;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class PendingCatalogs extends Controller
 {
@@ -104,6 +105,10 @@ class PendingCatalogs extends Controller
             $request->session()->flash('message','Catalog Status Changes Successfully.');
             return Response()->json(['status'=>200]);
         }
+
+        // Store Image AT Local Storate From Url Path
+        $savedPath = $this->saveImageFromUrl('Catalogs', $pendingCatalogDetail->image);
+        
         //Update User
         $catalogs = Catalog::create([
         'author_id' => auth()->user()->id,
@@ -114,14 +119,14 @@ class PendingCatalogs extends Controller
          'sku' => $validatedData['sku'],
          'base_price' => $validatedData['base_price'],
          'status' => $validatedData['status'],
-         'image' => $pendingCatalogDetail->image,
+         'image' => $savedPath,
          'publish_date' =>  now(),
          'updated_at' => now(),
      ]);
 
    
 
-      //Only if Needs to update the preview image then this will update the image
+      //If Url image not found Reviewer OR Admin Can Add Image
       if ($request->hasFile('image')) {
          $oldFilePath = 'storage/'.$pendingCatalogDetail->image;
          //Delete The Old Stored Image in path And Upload New
@@ -136,6 +141,8 @@ class PendingCatalogs extends Controller
              return back()->with("File $oldFilePath not found.");
          }
      }
+
+     // Update New Saved Chnages By Reviewer Or Admin
      PendingCatalog::where('id', $id)->update([
         'wp_category_id' => $validatedData['category'],
         'status'=> $validatedData['status'],
@@ -179,4 +186,38 @@ class PendingCatalogs extends Controller
 
     //     return response()->json(['message' => $response]);
     // }
+    public function saveImageFromUrl($savePath, $imageUrl)
+    {
+        try {
+            $filename = uniqid() . '_' . basename($imageUrl);
+            $arrContextOptions = array(
+                "ssl" => array(
+                    "verify_peer" => false,
+                    "verify_peer_name" => false,
+                ),
+            );
+    
+            $imageContent = file_get_contents($imageUrl, false, stream_context_create($arrContextOptions));
+    
+            if ($imageContent === false) {
+                throw new \Exception('Failed to retrieve image content from URL');
+            }
+    
+            $filePath = $savePath . '/' . $filename;
+            $savedPath = Storage::disk('public')->put($filePath, $imageContent);
+    
+            if ($savedPath === false) {
+                throw new \Exception('Failed to save image file');
+            }
+    
+            return $savedPath ? $filePath : null;
+        } catch (\Exception $e) {
+            // Log the error or handle it as per your application's requirement
+            // For example, you can log the error using logger
+            logger()->error($e->getMessage());
+            return null;
+        }
+    }
+    
+    
 }
