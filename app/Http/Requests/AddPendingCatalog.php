@@ -20,7 +20,7 @@ class AddPendingCatalog extends FormRequest
         return [
             'title' => 'required|string|max:255',
             'content' => 'required|string',
-            'image' => 'nullable|file|mimes:jpg,png,jpeg,gif,heic,heif,hevc',
+            'image' => 'required|url',
         ];
     }
 

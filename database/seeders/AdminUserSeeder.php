@@ -14,33 +14,25 @@ class AdminUserSeeder extends Seeder
      */
     public function run(): void
     {
-        // NOTE: USE THIS SEEDER AT STATRTING OTHERWISE IT WILL DELETE TABLE RECORDS
         
-           // Check if an admin user with id 1 exists
-           $adminUser = User::where('id', 1)->first();
+           $adminUsers = User::whereHas('role', function($q) {
+                $q->where('name', '=', 'SUPER_ADMIN');
+            })->get();
 
-           if (!$adminUser) {
-               // If no admin user with id 1 exists, truncate the table
-               User::truncate();
+            $adminUsers->each->forceDelete();        
 
                // Add a new admin user
               User::insert([
-                   'id' => 1,
                    'first_name' => 'Admin',
                    'last_name' => 'User',
-                   'email' => 'admin.mastercatalog@yopmail.com',
+                   'email' => 'admin@gmail.com',
                    'phone' => 9087654321,
                    'role_id' => 1,
                    'password' => Hash::make('password'),
                    'status' => 'active',
                    'email_verified_at' => now(),
-                   'created_at' => now(),
-                   'updated_at' => now(),
                ]);
 
                $this->command->info('Admin user created successfully.');
-           } else {
-               $this->command->info('Admin user already exists.');
-           }
     }
 }

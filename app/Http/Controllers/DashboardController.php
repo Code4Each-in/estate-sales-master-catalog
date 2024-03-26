@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Catalog;
+use App\Models\PendingCatalog;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -19,6 +20,9 @@ class DashboardController extends Controller
         //Count of Catalog 
         $catalogCount = Catalog::count();
 
-        return view('dashboard.index',compact('usersCount','catalogCount'));
+        //Count of Pending Catalog 
+        $pendingCatalogCount = PendingCatalog::where('status','draft')->count();
+
+        return view('dashboard.index',compact('usersCount','catalogCount','pendingCatalogCount'));
     }
 }

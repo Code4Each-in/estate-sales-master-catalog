@@ -1,11 +1,11 @@
 @extends('layouts.app')
-@section('title', 'Pending Catalog')
-@section('sub-title', 'Pending Catalog')
+@section('title', 'Pending Catalogs')
+@section('sub-title', 'Pending Catalogs')
 @section('content')
 <div id="loader">
-   
-    <div class="spinner-border text-warning loader-spinner"  role="status">
-                <span class="visually-hidden">Loading...</span>
+
+    <div class="spinner-border text-warning loader-spinner" role="status">
+        <span class="visually-hidden">Loading...</span>
     </div>
 </div>
 <section class="section catalog">
@@ -28,7 +28,6 @@
                                         <th scope="col">Title</th>
                                         <th scope="col">Catalog Id</th>
                                         <th scope="col">Base Price</th>
-                                        <th scope="col">SKU</th>
                                         <th scope="col">Publish Date</th>
                                         <th scope="col">Image</th>
                                         <th scope="col">Status</th>
@@ -41,15 +40,20 @@
                                         <th scope="row">{{ $index + 1 }}</th>
                                         <td>{{ucfirst($data->title) ?? ''}}</td>
                                         <td>{{$data->catalog_id ?? 'Null'}}</td>
-                                        <td>${{$data->base_price ?? ''}}</td>
-                                        <td>{{$data->sku ?? 'NA'}}</td>
+                                        <td>{{ $data->base_price !== null ? '$' . $data->base_price : '' }}</td>
                                         <td>{{$data->publish_date ?? 'NA'}}</td>
                                         <td>
-                                            @if ($data->image)
-                                            <img src="{{ asset('storage/' . $data->image) }}" height="40" width="70" alt="Catalog Image">
+                                        @if ($data->image)
+                                            @if (Str::startsWith($data->image, ['http://', 'https://']))
+                                                <a href="{{ $data->image }}" target="_blank">
+                                                    <img src="{{ $data->image }}" height="40" width="70" alt="Catalog Image">
+                                                </a>
                                             @else
-                                            NA
+                                                <img src="{{ asset('storage/' . $data->image) }}" height="40" width="70" alt="Catalog Image">
                                             @endif
+                                        @else
+                                            NA
+                                        @endif
                                         </td>
                                         <td>
                                             @if($data->status == 'draft')
@@ -63,7 +67,7 @@
 
                                             <!-- <i onClick="deleteModal('{{ $data->id }}')" href="javascript:void(0)" class="fa fa-trash fa-fw pointer btn-fa-catalog"></i> -->
 
-                                             <a onClick="editCatalogs('{{ $data->id }}')" href="javascript:void(0)" class="btn btn-default-border">Approve</a> 
+                                            <a onClick="editCatalogs('{{ $data->id }}')" href="javascript:void(0)" class="btn btn-default-border">View</a>
                                         </td>
                                     </tr>
                                     @endforeach
@@ -239,7 +243,7 @@
                                     <input type="hidden" class="form-control" name="pending_catalog_id" id="catalog_id" value="">
                                 </div>
                                 <div class="modal-footer">
-                                    <button type="submit" name="decline" class="btn btn-secondary" >Decline</button>
+                                    <button type="submit" name="decline" class="btn btn-secondary">Decline</button>
                                     <button type="submit" class="btn btn-default">Publish</button>
                                 </div>
                             </form>
@@ -260,10 +264,10 @@
                         </div>
                         <div class="modal-body">
                             <form id="deletePendingCatalogsForm">
-                                    <input type="hidden" name="id" id="id">                        
-                                        <p>Are You Sure You Want To Delete Catalog From Pending List?</p>
-                                        <button type="submit" class="btn btn-default">Yes</button>
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>         
+                                <input type="hidden" name="id" id="id">
+                                <p>Are You Sure You Want To Delete Catalog From Pending List?</p>
+                                <button type="submit" class="btn btn-default">Yes</button>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
                             </form>
                         </div>
                     </div>
@@ -274,26 +278,26 @@
 
         <!--start: Publish Pending Catalog Modal -->
         <div class="modal fade" id="publishPendingCatalog" tabindex="-1" aria-labelledby="role" aria-hidden="true">
-                <div class="modal-dialog modal-lg">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="role">Publish Catalog</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                            <form id="publishPendingCatalogForm">
-                                @csrf
-                                    <input type="hidden" name="id" id="id">                        
-                                        <p>Do You Want To Publish This Catelog.</p>
-                                        <button type="submit" class="btn btn-default">Approve</button>
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>         
-                            </form>
-                        </div>
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="role">Publish Catalog</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                </div>  
+                    <div class="modal-body">
+                        <form id="publishPendingCatalogForm">
+                            @csrf
+                            <input type="hidden" name="id" id="id">
+                            <p>Do You Want To Publish This Catelog.</p>
+                            <button type="submit" class="btn btn-default">Approve</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
-        <!--end: Publish Pending Catalog Modal -->
+    </div>
+    <!--end: Publish Pending Catalog Modal -->
 
     </div>
     </div>
@@ -430,45 +434,61 @@
     $('#editPendingCatalogsForm').submit(function(event) {
         id = $('#catalog_id').val();
         event.preventDefault();
-        
-         // Determine the action based on the button clicked
+
+        // Determine the action based on the button clicked
         var status;
         if ($(event.originalEvent.submitter).attr('name') === 'decline') {
             status = 'decline';
         } else {
             status = 'publish';
         }
-    console.log(status);
-        // var imageFile = $('#edit_image')[0].files[0];
-        var formData = new FormData(this);
-        formData.append('status', status);
-        // Check if an image file is selected
-        if ($('#edit_image')[0].files.length > 0) {
-            var imageFile = $('#edit_image')[0].files[0];
-            formData.append('image', imageFile);
-        }
-        // formData.append('image',imageFile);
-        $.ajax({
-            type: "POST",
-            url: `{{ route('pending-catalogs.update', ['catalog' => ':id']) }}`.replace(':id', id),
-            data: formData,
-            dataType: 'json',
-            processData: false,
-            contentType: false,
-            success: function(res) {
-                if (res.errors) {
-                    $('.alert-danger').html('');
-                    $.each(res.errors, function(key, value) {
-                        $('.alert-danger').show();
-                        $('.alert-danger').append('<li>' + value + '</li>');
-                    })
-                } else {
-                    $('.alert-danger').html('');
-                    $("#editCatalogs").modal('hide');
-                    location.reload();
-                }
+        if (confirm("Are you sure You Want To Continue to "+status+" Catalog ?")) {
+
+            // var imageFile = $('#edit_image')[0].files[0];
+            var formData = new FormData(this);
+            formData.append('status', status);
+            // Check if an image file is selected
+            if ($('#edit_image')[0].files.length > 0) {
+                var imageFile = $('#edit_image')[0].files[0];
+                formData.append('image', imageFile);
             }
-        });
+            // formData.append('image',imageFile);
+            $.ajax({
+                type: "POST",
+                url: `{{ route('pending-catalogs.update', ['catalog' => ':id']) }}`.replace(':id', id),
+                data: formData,
+                dataType: 'json',
+                processData: false,
+                contentType: false,
+                success: function(res) {
+                    if (res.errors) {
+                        console.log()
+                        $('.alert-danger').html('');
+                        $.each(res.errors, function(key, value) {
+                            $('.alert-danger').show();
+                            $('.alert-danger').append('<li>' + value + '</li>');
+                        })
+                    } else {
+                        $('.alert-danger').html('');
+                        $("#editCatalogs").modal('hide');
+                        location.reload();
+                    }
+                },
+                 error: function(xhr, textStatus, errorThrown) {
+                // Check if the status code is 422 (Unprocessable Entity)
+                if (xhr.status === 422) {
+                    // Parse the error response if available
+                    var errorResponse = xhr.responseJSON;
+                    if (errorResponse && errorResponse.errors) {
+                        displayErrors(errorResponse.errors);
+                        return;
+                    }
+                }
+                // If the error response is not in the expected format or no errors are found, display a generic error message
+                displayError('An error occurred while processing your request. Please try again later.');
+            }
+            });
+        }
     });
 
 
@@ -477,20 +497,20 @@
         event.preventDefault();
         var token = $('meta[name="csrf-token"]').attr('content');
         $.ajax({
-                type: "DELETE",
-                url: `{{ route('pending-catalogs.destroy', ['catalog' => ':id']) }}`.replace(':id', id),
-                data: {
-                    _token: token,
-                    id: id
-                },
-                dataType: 'json',
-                success: function(res) {
-                    location.reload();
-                },
-                error: function(xhr, status, error) {
-                    // Handle errors
-                }
-            });
+            type: "DELETE",
+            url: `{{ route('pending-catalogs.destroy', ['catalog' => ':id']) }}`.replace(':id', id),
+            data: {
+                _token: token,
+                id: id
+            },
+            dataType: 'json',
+            success: function(res) {
+                location.reload();
+            },
+            error: function(xhr, status, error) {
+                // Handle errors
+            }
+        });
     });
 
 
@@ -498,84 +518,84 @@
         $('#deletePendingCatalog').modal('show');
         $('#id').val(id);
     }
-    
+
 
     $('#publishPendingCatalogForm').submit(function(event) {
         id = $('#id').val();
         // console.log(id);
         event.preventDefault();
         var formData = new FormData(this);
-        formData.set('id',id);
+        formData.set('id', id);
         var token = $('meta[name="csrf-token"]').attr('content');
         // Display the key/value pairs
         // for (var pair of formData.entries()) {
         //     console.log(pair[0]+ ', ' + pair[1]); ßß
         // }
         $.ajax({
-        type: "POST",
-        url: "{{ route('pending-catalogs.publish') }}",
-        // url: `{{ route('catalogs.update', ['catalog' => ':id']) }}`.replace(':id', id),
+            type: "POST",
+            url: "{{ route('pending-catalogs.publish') }}",
+            // url: `{{ route('catalogs.update', ['catalog' => ':id']) }}`.replace(':id', id),
 
-        data: formData,
-        processData: false,
-        contentType: false,
-        headers: {
-            'X-CSRF-TOKEN': token
-        },
-        success: function(res) {
-            console.log(res);
-            if (res.errors) {
-                $('.alert-danger').html('');
-                $.each(res.errors, function(key, value) {
-                    $('.alert-danger').show();
-                    $('.alert-danger').append('<li>' + value + '</li>');
-                });
-            } else {
-                $('.alert-danger').html('');
-                $("#editCatalogs").modal('hide');
-                // Optionally, you can reload the page or perform any other action
-                // location.reload();
+            data: formData,
+            processData: false,
+            contentType: false,
+            headers: {
+                'X-CSRF-TOKEN': token
+            },
+            success: function(res) {
+                console.log(res);
+                if (res.errors) {
+                    $('.alert-danger').html('');
+                    $.each(res.errors, function(key, value) {
+                        $('.alert-danger').show();
+                        $('.alert-danger').append('<li>' + value + '</li>');
+                    });
+                } else {
+                    $('.alert-danger').html('');
+                    $("#editCatalogs").modal('hide');
+                    // Optionally, you can reload the page or perform any other action
+                    // location.reload();
+                }
+            },
+            error: function(xhr, textStatus, errorThrown) {
+                // This function is called when the AJAX request encounters an error
+                console.error(xhr.status);
+                console.error(textStatus);
+                console.error(errorThrown);
+
+                // Optionally, you can display a generic error message to the user
+                $('.alert-danger').html('An error occurred. Please try again.');
+                $('.alert-danger').show();
             }
-        },
-        error: function(xhr, textStatus, errorThrown) {
-            // This function is called when the AJAX request encounters an error
-            console.error(xhr.status); 
-            console.error(textStatus);
-            console.error(errorThrown);  
-
-            // Optionally, you can display a generic error message to the user
-            $('.alert-danger').html('An error occurred. Please try again.');
-            $('.alert-danger').show();
-        }
-    });
+        });
     });
 
-      function publishCatalog(id) {
-        console.log(id);    
-        $('#publishPendingCatalog').modal('show');    
+    function publishCatalog(id) {
+        console.log(id);
+        $('#publishPendingCatalog').modal('show');
         $('#id').val(id);
 
-            // var token = $('meta[name="csrf-token"]').attr('content'); // Retrieve CSRF token from meta tag
+        // var token = $('meta[name="csrf-token"]').attr('content'); // Retrieve CSRF token from meta tag
 
-            // $.ajax({
-            //     type: "POST",
-            //     url: "{{ route('pending-catalogs.publish') }}",
-            //     data: {
-            //         _token: token, // Include CSRF token in the request data
-            //         id: id
-            //     },
-            //     dataType: 'json',
-            //     success: function(res) {
-            //         location.reload();
-            //     },
-            //     error: function(xhr, status, error) {
-            //         // Handle errors
-            //     }
-            // });
+        // $.ajax({
+        //     type: "POST",
+        //     url: "{{ route('pending-catalogs.publish') }}",
+        //     data: {
+        //         _token: token, // Include CSRF token in the request data
+        //         id: id
+        //     },
+        //     dataType: 'json',
+        //     success: function(res) {
+        //         location.reload();
+        //     },
+        //     error: function(xhr, status, error) {
+        //         // Handle errors
+        //     }
+        // });
     }
 
     // Function to fetch categories using Axios
-    function fetchCategories() { 
+    function fetchCategories() {
         // console.log("here");
         axios.get('/fetch-catalog-categories')
             .then(function(response) {
@@ -606,9 +626,10 @@
                 categories.forEach(function(category) {
                     $('#edit_category').append($('<option>').text(category.name).val(category.id));
                 });
-              $('#loader').hide(); 
+                $('#loader').hide();
             })
             .catch(function(error) {
+                $('#loader').hide();
                 console.error(error);
             });
     }

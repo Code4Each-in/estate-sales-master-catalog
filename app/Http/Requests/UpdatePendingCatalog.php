@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class UpdatePendingCatalog extends FormRequest
 {
@@ -27,7 +28,12 @@ class UpdatePendingCatalog extends FormRequest
             'category' => 'nullable',
             // 'name' => 'required|string|max:255',
             'sku' => 'nullable|string',
-            'base_price' => 'required',
+            'base_price' => [
+                Rule::requiredIf(function () {
+                    return $this->status !== 'decline';
+                }),
+                'nullable',
+            ],
             'status' => 'required',
             'image' => 'nullable|file|mimes:jpg,png,jpeg,gif,heic,heif,hevc',
         ];

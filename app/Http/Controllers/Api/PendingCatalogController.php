@@ -23,6 +23,7 @@ class PendingCatalogController extends Controller
                 $pendingCatalog = PendingCatalog::create([
                     'title' => $validatedData['title'],
                     'content' => $validatedData['content'],
+                    'image' => $validatedData['image'],
                     'status' => 'draft',
                     'publish_date' => null,
                 ]);

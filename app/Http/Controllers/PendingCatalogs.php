@@ -95,12 +95,10 @@ class PendingCatalogs extends Controller
      */
     public function update(UpdatePendingCatalog $request, string $id)
     {
-        // dd($request);
-
         //Request Data validation
         $validatedData = $request->validated();
        $pendingCatalogDetail = PendingCatalog::find($id);
-    //    dd( $pendingCatalogDetail);
+
         if($validatedData['status'] == 'decline'){
                PendingCatalog::where('id', $id)->update(['status'=> $validatedData['status']]);
             $request->session()->flash('message','Catalog Status Changes Successfully.');
@@ -142,6 +140,8 @@ class PendingCatalogs extends Controller
         'wp_category_id' => $validatedData['category'],
         'status'=> $validatedData['status'],
         'author_id' => auth()->user()->id,
+        'sku' => $validatedData['sku'],
+        'base_price' => $validatedData['base_price'],
         'master_catalog_id' => $catalogs->id
     ]);
 

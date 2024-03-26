@@ -1,6 +1,6 @@
 @extends('layouts.app')
-@section('title', 'Catalog')
-@section('sub-title', 'Catalog')
+@section('title', 'Catalogs')
+@section('sub-title', 'Catalogs')
 @section('content')
 <div id="loader">
    
