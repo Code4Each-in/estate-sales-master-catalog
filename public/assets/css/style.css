@@ -1337,3 +1337,20 @@ header .header-alert{
   left: 45%;
 
 }
+
+.text-wrapper {
+  display: flex;
+  justify-content: flex-end;
+  margin: 0px auto;
+  align-items: center;
+  width: 100%;
+}
+
+a.text {
+  color: #000;
+  font-size: 20px;
+  font-weight: 600;
+}
+a.text:hover {
+  color: #932828;
+}

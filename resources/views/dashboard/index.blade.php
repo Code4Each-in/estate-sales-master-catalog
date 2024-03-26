@@ -49,8 +49,8 @@
                 </div>
                 <!-- End Catalogs Card -->
 
-                       <!-- Pending Catlogs Card -->
-                       <div class="col-xxl-4 col-md-6">
+                <!-- Pending Catlogs Card -->
+                <div class="col-xxl-4 col-md-6">
                     <div class="card info-card sales-card">
 
                         <div class="card-body">
@@ -62,8 +62,8 @@
                                 <div class="ps-3">
                                     <h6>{{$pendingCatalogCount}}</h6>
                                 </div>
-                                <div>
-                                    <a href="{{route('pending-catalogs.index')}}" class="mx-auto">View</a>
+                                <div class="text-wrapper">
+                                    <a href="{{route('pending-catalogs.index')}}" class="text">View</a>
                                 </div>
                             </div>
                         </div>      
