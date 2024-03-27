@@ -22,7 +22,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::middleware('custom.token')->group(function () {
     Route::get('get-catalog-detail',[CatalogController::class,'getCatalogDetail']);
+    Route::get('fetch-detail-catalogs-by-id',[CatalogController::class,'fetchCatalogsDetailWithStatusByIds']);
     Route::post('save-pending-catalog',[PendingCatalogController::class,'savePendingCatalog']);
-
+    
 });
 

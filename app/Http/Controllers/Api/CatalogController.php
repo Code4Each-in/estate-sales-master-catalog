@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Catalog;
+use App\Models\PendingCatalog;
 use Illuminate\Http\Request;
 
 class CatalogController extends Controller
@@ -47,6 +48,54 @@ class CatalogController extends Controller
             $response['data'] = $results;
         }
     
+        return response()->json($response); 
+    }
+
+    public function  fetchCatalogsDetailWithStatusByIds()
+    {
+        $response = [
+            'success' => false,
+            'status' => 400,
+            'message' => 'Error fetching catalog details.'
+        ];
+
+        $catalogIds = request()->input('catalog_ids');
+        $pendingCatalogIds = request()->input('pending_catalog_ids');
+
+        if($catalogIds){
+            $catalogDetail =  Catalog::whereIn('id',$catalogIds)->get();
+            if(!empty($catalogDetail)){
+                foreach ($catalogDetail as $result) {
+                    if ($result->image != null) {
+                        $result->image = '/storage/'. $result->image;
+                    }
+                }
+            }
+        }
+        
+
+        if($pendingCatalogIds){
+            $pendingCatalogDetail =  PendingCatalog::whereIn('id',$pendingCatalogIds)->get();
+            // if(!empty($pendingCatalogDetail)){
+            //     foreach ($pendingCatalogDetail as $result) {
+            //         if ($result->image != null) {
+            //             $result->image = '/storage/'. $result->image;
+            //         }
+            //     }
+            // }
+        }
+        $data['catlogDetail'] =  $catalogDetail;
+        $data['pendingCatalogDetail'] =  $pendingCatalogDetail;
+
+
+        // dd($catalogIds,$pendingCatalogIds);
+
+        $response = [
+            'success' => true,
+            'status' => 200,
+            'message' => 'Data Retrived Successfully',
+            'data' => $data,
+        ];
         return response()->json($response); 
     }
     
