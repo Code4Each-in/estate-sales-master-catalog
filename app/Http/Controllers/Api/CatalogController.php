@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Catalog;
 use App\Models\PendingCatalog;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class CatalogController extends Controller
 {
@@ -76,13 +77,17 @@ class CatalogController extends Controller
 
         if($pendingCatalogIds){
             $pendingCatalogDetail =  PendingCatalog::whereIn('id',$pendingCatalogIds)->get();
-            // if(!empty($pendingCatalogDetail)){
-            //     foreach ($pendingCatalogDetail as $result) {
-            //         if ($result->image != null) {
-            //             $result->image = '/storage/'. $result->image;
-            //         }
-            //     }
-            // }
+            if (!empty($pendingCatalogDetail)) {
+                foreach ($pendingCatalogDetail as $result) {
+                    if ($result->image !== null) {
+                        // Check if the URL is external
+                        $isExternal = Str::startsWith($result->image, ['http://', 'https://']);
+                        if (!$isExternal) {
+                            $result->image = '/storage/' . $result->image;
+                        }
+                    }
+                }
+            }
         }
         $data['catlogDetail'] =  $catalogDetail ?? [] ;
         $data['pendingCatalogDetail'] =  $pendingCatalogDetail ?? [];
