@@ -84,8 +84,8 @@ class CatalogController extends Controller
             //     }
             // }
         }
-        $data['catlogDetail'] =  $catalogDetail;
-        $data['pendingCatalogDetail'] =  $pendingCatalogDetail;
+        $data['catlogDetail'] =  $catalogDetail ?? [] ;
+        $data['pendingCatalogDetail'] =  $pendingCatalogDetail ?? [];
 
 
         // dd($catalogIds,$pendingCatalogIds);
