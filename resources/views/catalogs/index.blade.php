@@ -57,13 +57,15 @@
                                             @endif
                                         </td>
                                         <td>
+                                            <a href="{{ url('/catalog/'.$data->id)}}" data-toggle="tooltip" data-placement="left" title="Show Products">
+                                                <i class="fa fa-eye fa-fw pointer btn-fa-catalog"></i>
+                                            </a>
                                             <i onClick="editCatalogs('{{ $data->id }}')" href="javascript:void(0)" class="fa fa-edit fa-fw pointer btn-fa-catalog"></i>
 
                                             {{-- <i onClick="deleteCatalogs('{{ $data->id }}')" href="javascript:void(0)" class="fa fa-trash fa-fw pointer btn-fa-catalog"></i> --}}
 
                                             <i onClick="deleteModal('{{ $data->id }}')" href="javascript:void(0)" class="fa fa-trash fa-fw pointer btn-fa-catalog"></i>
-
-                                            <a href="{{ url('/catalog/'.$data->id)}}" class="btn btn-default-border">Show Products</a>
+                                
                                         </td>
                                     </tr>
                                     @endforeach
@@ -163,7 +165,7 @@
 
 
                 <!--start: Edit users Modal -->
-                <div class="modal fade" id="editCatalogs" tabindex="-1" aria-labelledby="role" aria-hidden="true" style="overflow:hidden;">
+                <div class="modal fade" id="editCatalogs" aria-labelledby="role" aria-hidden="true">
                     <div class="modal-dialog modal-lg">
                         <div class="modal-content">
                             <div class="modal-header">
@@ -282,7 +284,9 @@
 @section('custom_js')
 <script>
     $(document).ready(function() {
-
+        $(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+})
         $('#users_table').DataTable({
             "order": []
 
@@ -398,7 +402,8 @@ fetchCategoriesForEdit();
                     $('#edit_base_price').val(res.catalogs.base_price);
                     $('#edit_status option[value="' + res.catalogs.status + '"]').attr('selected',
                         'selected');
-                    $("#edit_category").select2('val',res.catalogs.wp_category_id);
+                    $('#edit_category').val(res.catalogs.wp_category_id).trigger('change');
+                    // $("#edit_category").select2('val',res.catalogs.wp_category_id);
                     // $('#edit_category').select2().val(225).trigger('change');
                 }
             }

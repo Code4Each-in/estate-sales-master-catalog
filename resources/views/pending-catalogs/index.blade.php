@@ -67,7 +67,7 @@
 
                                             <!-- <i onClick="deleteModal('{{ $data->id }}')" href="javascript:void(0)" class="fa fa-trash fa-fw pointer btn-fa-catalog"></i> -->
 
-                                            <a onClick="editCatalogs('{{ $data->id }}')" href="javascript:void(0)" class="btn btn-default-border">View</a>
+                                            <a onClick="editCatalogs('{{ $data->id }}')" href="javascript:void(0)" class="fa fa-eye btn-fa-catalog" data-toggle="tooltip" data-placement="left" title="View"></a>
                                         </td>
                                     </tr>
                                     @endforeach
@@ -167,7 +167,7 @@
 
 
                 <!--start: Edit users Modal -->
-                <div class="modal fade" id="editCatalogs" tabindex="-1" aria-labelledby="role" aria-hidden="true">
+                <div class="modal fade" id="editCatalogs" aria-labelledby="role" aria-hidden="true">
                     <div class="modal-dialog modal-lg">
                         <div class="modal-content">
                             <div class="modal-header">
@@ -309,7 +309,9 @@
 @section('custom_js')
 <script>
     $(document).ready(function() {
-
+        $(function () {
+             $('[data-toggle="tooltip"]').tooltip()
+        });
         $('#users_table').DataTable({
             "order": []
 
@@ -404,7 +406,7 @@
         // Display a single error message
         $('.alert-danger').html(errorMessage).show();
     }
-
+    
     function editCatalogs(id) {
         $('#loader').show(); 
         //fetch category on modal open
@@ -423,6 +425,7 @@
                     $('#edit_content').val(res.catalogs.content);
                     $('#edit_sku').val(res.catalogs.sku);
                     $('#edit_base_price').val(res.catalogs.base_price);
+                    $('#edit_category').val(res.catalogs.wp_category_id).trigger('change');
                     // $('#edit_status option[value="' + res.catalogs.status + '"]').attr('selected',
                     //     'selected');
                 }
