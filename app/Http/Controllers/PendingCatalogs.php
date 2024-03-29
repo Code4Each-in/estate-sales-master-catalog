@@ -25,7 +25,7 @@ class PendingCatalogs extends Controller
             $catalogs = PendingCatalog::all();
         }else{
             if (request()->has('status_filter') && request()->input('status_filter')!= '') {
-                $catalogs = Catalog::where('status',request()->input('status_filter'))->get();
+                $catalogs = PendingCatalog::where('status',request()->input('status_filter'))->get();
             }else{
                 $catalogs = PendingCatalog::whereNot('status','publish')->get(); 
             }
