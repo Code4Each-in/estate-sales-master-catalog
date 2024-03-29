@@ -311,14 +311,88 @@
 @endsection
 @section('custom_js')
 <script>
+     var catalogsTable;
     $(document).ready(function() {
         $(function () {
   $('[data-toggle="tooltip"]').tooltip()
 })
-        $('#catalogs_table').DataTable({
-            "order": []
+        // $('#catalogs_table').DataTable({
+        //     "order": []
 
-        });
+        // });
+
+        catalogsTable = $('#catalogs_table').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: "{{ route('catalogs.index') }}",
+            paging: true, // Enable server-side pagination
+            pageLength: 10, // Initial number of entries per page
+            columns: [
+                { name: 'Id', 
+                    render: function (data, type, row) {
+                      return row.id;    
+                    }
+                },
+                { name: 'Title', 
+                    render: function (data, type, row) {
+                      return row.title;    
+                    }
+                },
+                { name: 'Base Price', 
+                    render: function (data, type, row) {
+                      return '$'+row.base_price ?? '';    
+                    }
+                },{ name: 'SKU', 
+                    render: function (data, type, row) {
+                      return row.sku ?? 'NA';    
+                    }
+                },{ name: 'Publish Date', 
+                    render: function (data, type, row) {
+                      return row.publish_date ?? 'NA';    
+                    }
+                },
+                {
+                    name: 'Image',
+                    render: function(data, type, row) {
+                        var image = "NA";
+                        if (row.image) {
+                            image = '<img src="{{ asset('storage') }}/' + row.image + '" height="40" width="70" alt="Catalog Image">';
+                        }
+                        return image;
+                    }
+                },
+                { name: 'Status', 
+                    render: function (data, type, row) {
+                        if (row.status === 'draft') {
+                            return '<span class="badge rounded-pill bg-warning">Draft</span>';
+                        } else if (row.status === 'publish') {
+                            return '<span class="badge rounded-pill bg-success">Publish</span>';
+                        } else {
+                            return '----';
+                        }   
+                    }
+                },
+                {
+                    name: 'Action',
+                    orderable: false,
+                    searchable: false,
+                    render: function(data, type, row) {
+                        var action = '';
+                        var baseUrl = window.location.origin + '/catalog/';
+                        action += '<a href="' + baseUrl + row.id + '" data-toggle="tooltip" data-placement="left" title="Show Products">';
+                        action += '<i class="fa fa-eye fa-fw pointer btn-fa-catalog"></i></a>';
+                        action += '<i onClick="editCatalogs(\'' + row.id + '\')" href="javascript:void(0)" class="fa fa-edit fa-fw pointer btn-fa-catalog"></i>';
+                        action += '<i onClick="deleteModal(\'' + row.id + '\')" href="javascript:void(0)" class="fa fa-trash fa-fw pointer btn-fa-catalog"></i>';
+                        return action;
+                    }
+                }
+
+
+            ],
+            rowCallback: function (row, data) {
+                $(row).addClass('row_status_'+data.id); // Add a CSS class to the row
+            }
+    });
         //hide error bag on modal close
         $(".modal").on("hidden.bs.modal", function() {
             $('.alert-danger').hide().html('');

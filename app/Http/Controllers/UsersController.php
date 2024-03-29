@@ -39,8 +39,8 @@ class UsersController extends Controller
                     $query->where('id', request()->input('role_filter')); 
                 });
             }
-            
-           $users =  $users->get();
+
+           $users = $users->get();
             
         }else{
             $users = [];

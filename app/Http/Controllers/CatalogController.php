@@ -32,6 +32,31 @@ class CatalogController extends Controller
                  $catalogs = Catalog::where('status','publish')->get();
             }
         }
+
+        // DataTable Pagination 
+        if (request()->ajax()) {
+            $query = Catalog::where('status','publish');
+
+             // Implement server-side pagination
+             $start = request()->input('start', 0);
+             $length = request()->input('length', 10);
+
+             $filteredQuery = clone $query;
+             $totalRecords = $filteredQuery->count();
+ 
+             $data = $query
+                 ->skip($start)
+                 ->take($length)
+                 ->get();
+
+            return response()->json([
+                'data' => $data,
+                'draw' => request()->input('draw', 1),
+                'recordsTotal' => $totalRecords,
+                'recordsFiltered' => $totalRecords,
+            ]);
+        }
+
         return view('catalogs.index',compact('catalogs','allCatalogsFilter'));
     }
 
