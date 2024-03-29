@@ -12,19 +12,19 @@
                     <!-- <h5 class="card-title">Table with stripped rows</h5> -->
                     <form id="filter-data-form" method="GET" action="{{ route('users.index') }}">
                         <div class="row mt-3 mx-auto">
-                            <div class="col-md-4 filtersContainer d-flex p-0">
+                            <div class="col-md filtersContainer d-flex p-0">
                                 <div style="margin-right:20px;">
                                     <input type="checkbox" class="form-check-input" name="all_users" id="all_users"
                                     {{ $allUsersFilter == 'on' ? 'checked' : '' }}  > 
                                         <label for="all_users">All</label>
                                 </div>
                             </div>
-                            <div class="col-md-3 form-group">
+                            <div class="col-md form-group">
                                 <div class="row">
-                                    <div class="col-md-2">
+                                    <div class="col-md">
                                         <label for="roleFilterselectBox">Role:</label>
                                     </div>
-                                    <div class="col-md-8">
+                                    <div class="col-md">
                                         <select class="form-control" id="roleFilterselectBox" name="role_filter">
                                             <option value="" selected >Select Role</option>
                                             @foreach ( $roles as $role)
