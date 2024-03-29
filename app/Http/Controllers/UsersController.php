@@ -17,6 +17,11 @@ class UsersController extends Controller
      */
     public function index()
     {
+        $usersFilter = request()->all() ;
+        $allUsersFilter = $usersFilter['all_users'] ?? '';
+        $rolesFilter =  $rolesFilter['role_filter'] ?? '';
+     
+
         $loginUser = auth()->user();
         //Get Roles For User Without Super Admin
         $roles = Role::whereNot('name','SUPER_ADMIN')->get();
@@ -24,12 +29,24 @@ class UsersController extends Controller
         if($loginUser->role->name == 'SUPER_ADMIN'){
             $users = User::with('role')->whereHas('role', function($q) {
                 $q->where('name', '!=', 'SUPER_ADMIN');
-            })->get();
+            });
+            if(!$allUsersFilter  == 'on'){
+                $users = $users->where('status','active');
+            }
+
+            if (request()->has('role_filter') && request()->input('role_filter')!= '') {
+                $users = $users->whereHas('role', function($query) { 
+                    $query->where('id', request()->input('role_filter')); 
+                });
+            }
+            
+           $users =  $users->get();
+            
         }else{
             $users = [];
         }
         
-        return view('users.index',compact('users','roles'));
+        return view('users.index',compact('users','roles','allUsersFilter'));
     }
 
     /**

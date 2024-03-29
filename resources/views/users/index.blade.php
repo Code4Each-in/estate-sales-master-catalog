@@ -10,7 +10,36 @@
                 <div class="card-body">
                     <button class="btn btn-default my-3" onClick="openusersModal()" href="javascript:void(0)">Add User</button>
                     <!-- <h5 class="card-title">Table with stripped rows</h5> -->
-                    <br>
+                    <form id="filter-data-form" method="GET" action="{{ route('users.index') }}">
+                        <div class="row mt-3 mx-auto">
+                            <div class="col-md-4 filtersContainer d-flex p-0">
+                                <div style="margin-right:20px;">
+                                    <input type="checkbox" class="form-check-input" name="all_users" id="all_users"
+                                    {{ $allUsersFilter == 'on' ? 'checked' : '' }}  > 
+                                        <label for="all_users">All</label>
+                                </div>
+                            </div>
+                            <div class="col-md-3 form-group">
+                                <div class="row">
+                                    <div class="col-md-2">
+                                        <label for="roleFilterselectBox">Role:</label>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <select class="form-control" id="roleFilterselectBox" name="role_filter">
+                                            <option value="" selected >Select Role</option>
+                                            @foreach ( $roles as $role)
+                                            <option value="{{$role->id}}" {{ request()->input('role_filter') == $role->id ? 'selected' : '' }} >{{$role->name}}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    @if ($errors->has('role_filter'))
+                                        <span style="font-size: 10px;" class="text-danger">{{ $errors->first('role_filter') }}</span>
+                                    @endif
+                                </div>  
+                            </div>
+                        </div>
+                    </form>
+                    <br/>
 
                     <!-- Table with stripped rows -->
                     <div class="box-header with-border" id="filter-box">
@@ -404,8 +433,24 @@
         }
     }
 
+       // Event listener for checkbox changes
+       $("#all_users").change(function() {
+            // Submit the form
+            $("#filter-data-form").submit();
+        });
 
+        // Form submission
+        // $("#filter-data-form").submit(function(event) {
+        //     // Disable unchecked checkboxes
+        //     if (!$("#all_catalogs").prop('checked')) {
+        //     $("#all_catalogs").prop('disabled', true);
+        //     }
+        // });
 
-    
+         //Submit form on change the value of Project
+         document.getElementById("roleFilterselectBox").addEventListener("change", function() {
+                    document.getElementById("filter-data-form").submit();
+                });
+
 </script>
 @endsection

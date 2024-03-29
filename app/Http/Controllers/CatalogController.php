@@ -18,9 +18,17 @@ class CatalogController extends Controller
      */
     public function index()
     {    
-        $catalogs = Catalog::all();
+        $catalogsFilter = request()->all() ;
+        $allCatalogsFilter = $catalogsFilter['all_catalogs'] ?? '';
+        if ($allCatalogsFilter == 'on') {
+            $catalogs = Catalog::all();
+        }else{
+            $catalogs = Catalog::where('status','publish')->get();
+        }
+        
+       
 
-        return view('catalogs.index',compact('catalogs'));
+        return view('catalogs.index',compact('catalogs','allCatalogsFilter'));
     }
 
     /**

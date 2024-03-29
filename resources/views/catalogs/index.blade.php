@@ -13,15 +13,27 @@
         <!-- Left side columns -->
         <div class="col-lg-12">
             <div class="card">
+                
                 <div class="card-body">
                     <button class="btn btn-default my-3" onClick="openCatalogModal()" href="javascript:void(0)">Add Catalog</button>
                     <!-- <h5 class="card-title">Table with stripped rows</h5> -->
                     <br>
+                    <form id="filter-data" method="GET" action="{{ route('catalogs.index') }}">
+                        <div class="row mt-3 mx-auto">
+                            <div class="col-md-4 filtersContainer d-flex p-0">
+                                <div style="margin-right:20px;">
+                                    <input type="checkbox" class="form-check-input" name="all_catalogs" id="all_catalogs"
+                                    {{ $allCatalogsFilter == 'on' ? 'checked' : '' }}  > 
+                                        <label for="all_catalogs">All</label>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
 
                     <!-- Table with stripped rows -->
                     <div class="box-header with-border" id="filter-box">
                         <div class="box-body table-responsive" style="margin-bottom: 5%">
-                            <table class="datatable table table-striped my-2" id="users_table">
+                            <table class="datatable table table-striped my-2" id="catalogs_table">
                                 <thead>
                                     <tr>
                                         <th scope="col">#</th>
@@ -287,7 +299,7 @@
         $(function () {
   $('[data-toggle="tooltip"]').tooltip()
 })
-        $('#users_table').DataTable({
+        $('#catalogs_table').DataTable({
             "order": []
 
         });
@@ -532,5 +544,19 @@ fetchCategoriesForEdit();
                 console.error(error);
             });
     }
+
+        // Event listener for checkbox changes
+        $("#filter-data input:checkbox").change(function() {
+                    // Submit the form
+                    $("#filter-data").submit();
+                });
+
+                // Form submission
+                $("#filter-data").submit(function(event) {
+                    // Disable unchecked checkboxes
+                    if (!$("#all_catalogs").prop('checked')) {
+                    $("#all_catalogs").prop('disabled', true);
+                    }
+                });
 </script>
 @endsection

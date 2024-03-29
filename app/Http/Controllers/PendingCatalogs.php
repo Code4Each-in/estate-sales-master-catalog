@@ -17,11 +17,19 @@ class PendingCatalogs extends Controller
      */
     public function index()
     {    
-        $catalogs = PendingCatalog::whereNot('status','publish')->get();
+
+        $catalogsFilter = request()->all() ;
+        $allCatalogsFilter = $catalogsFilter['all_catalogs'] ?? '';
+
+        if ($allCatalogsFilter == 'on') {
+            $catalogs = PendingCatalog::all();
+        }else{
+             $catalogs = PendingCatalog::whereNot('status','publish')->get();
+        }
         // $catalogs = PendingCatalog::all();
 
 
-        return view('pending-catalogs.index',compact('catalogs'));
+        return view('pending-catalogs.index',compact('catalogs','allCatalogsFilter'));
     }
 
     /**
