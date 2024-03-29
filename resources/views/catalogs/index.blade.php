@@ -17,7 +17,6 @@
                 <div class="card-body">
                     <button class="btn btn-default my-3" onClick="openCatalogModal()" href="javascript:void(0)">Add Catalog</button>
                     <!-- <h5 class="card-title">Table with stripped rows</h5> -->
-                    <br>
                     <form id="filter-data" method="GET" action="{{ route('catalogs.index') }}">
                         <div class="row mt-3 mx-auto">
                             <div class="col-md-4 filtersContainer d-flex p-0">
@@ -27,8 +26,25 @@
                                         <label for="all_catalogs">All</label>
                                 </div>
                             </div>
+                                <div class="col-md-8 form-group1">
+                                        <div class="main-input">
+                                        <label for="statusFilterselectBox">Status:</label>    
+                                            <select class="form-control" id="statusFilterselectBox" name="status_filter">
+                                                <option value="" selected >Select Status</option>
+                                                <option value="draft" {{ request()->input('status_filter') == 'draft' ? 'selected' : '' }} >Draft</option>
+                                                <option value="publish" {{ request()->input('status_filter') == 'publish' ? 'selected' : '' }} >Publish</option>
+                                                <!-- <option value="decline" {{ request()->input('status_filter') == 'decline' ? 'selected' : '' }} >Decline</option> -->               
+                                            </select>
+                                        </div>
+                                        @if ($errors->has('status_filter'))
+                                            <span style="font-size: 10px;" class="text-danger">{{ $errors->first('status_filter') }}</span>
+                                        @endif
+                                </div>
                         </div>
+                       
                     </form>
+                    <br>
+                    
 
                     <!-- Table with stripped rows -->
                     <div class="box-header with-border" id="filter-box">
@@ -557,6 +573,11 @@ fetchCategoriesForEdit();
                     if (!$("#all_catalogs").prop('checked')) {
                     $("#all_catalogs").prop('disabled', true);
                     }
+                });
+
+                //Submit form on change the value of Project
+         document.getElementById("statusFilterselectBox").addEventListener("change", function() {
+                    document.getElementById("filter-data").submit();
                 });
 </script>
 @endsection

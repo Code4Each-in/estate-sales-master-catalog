@@ -1354,3 +1354,18 @@ a.text {
 a.text:hover {
   color: #932828;
 }
+
+.main-input {
+  display: flex;
+  width: 50%;
+  / margin: 0px auto; /
+  flex-wrap: nowrap;
+  align-content: center;
+  align-items: center;
+}
+.col-md-8.form-group1 {
+  display: flex;
+  justify-content: end;
+  margin: 0px auto;
+  / width: 47%; /
+}

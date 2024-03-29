@@ -26,6 +26,20 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="col-md-8 form-group1">
+                                <div class="main-input">
+                                    <label for="statusFilterselectBox">Status:</label>    
+                                    <select class="form-control" id="statusFilterselectBox" name="status_filter">
+                                        <option value="" selected >Select Status</option>
+                                        <option value="draft" {{ request()->input('status_filter') == 'draft' ? 'selected' : '' }} >Draft</option>
+                                        <option value="publish" {{ request()->input('status_filter') == 'publish' ? 'selected' : '' }} >Publish</option>
+                                        <option value="decline" {{ request()->input('status_filter') == 'decline' ? 'selected' : '' }} >Decline</option>               
+                                    </select>
+                                </div>
+                                @if ($errors->has('status_filter'))
+                                    <span style="font-size: 10px;" class="text-danger">{{ $errors->first('status_filter') }}</span>
+                                @endif
+                        </div>
                     </form>
                     <br>
 
@@ -661,6 +675,11 @@
             $("#all_catalogs").prop('disabled', true);
             }
         });
+
+            //Submit form on change the value of Project
+            document.getElementById("statusFilterselectBox").addEventListener("change", function() {
+                    document.getElementById("filter-data").submit();
+                });
 
 </script>
 @endsection

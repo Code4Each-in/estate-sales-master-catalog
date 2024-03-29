@@ -20,14 +20,18 @@ class CatalogController extends Controller
     {    
         $catalogsFilter = request()->all() ;
         $allCatalogsFilter = $catalogsFilter['all_catalogs'] ?? '';
+        // $rolesFilter =  $rolesFilter['status_filter'] ?? '';
+
+
         if ($allCatalogsFilter == 'on') {
             $catalogs = Catalog::all();
         }else{
-            $catalogs = Catalog::where('status','publish')->get();
+            if (request()->has('status_filter') && request()->input('status_filter')!= '') {
+                $catalogs = Catalog::where('status',request()->input('status_filter'))->get();
+            }else{
+                 $catalogs = Catalog::where('status','publish')->get();
+            }
         }
-        
-       
-
         return view('catalogs.index',compact('catalogs','allCatalogsFilter'));
     }
 
@@ -71,7 +75,6 @@ class CatalogController extends Controller
                 $uploadedFile->storeAs('public/Catalogs', $filename);
                 $path = 'Catalogs/' . $filename;
                 Catalog::where('id', $catalog->id)->update(['image' => $path]);
-
         }
 
         $request->session()->flash('message','Catalog Saved Successfully.');
