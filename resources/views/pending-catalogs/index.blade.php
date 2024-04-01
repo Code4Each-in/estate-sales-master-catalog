@@ -18,13 +18,6 @@
                     <!-- <h5 class="card-title">Table with stripped rows</h5> -->
                     <form id="filter-data" method="GET" action="{{ route('pending-catalogs.index') }}">
                         <div class="row mt-3 mx-auto">
-                            {{-- <div class="col-md-4 filtersContainer d-flex p-0">
-                                <div style="margin-right:20px;">
-                                    <input type="checkbox" class="form-check-input" name="all_catalogs" id="all_catalogs"
-                                    {{ $allCatalogsFilter == 'on' ? 'checked' : '' }}  > 
-                                        <label for="all_catalogs">All</label>
-                                </div> 
-                            </div>--}}
                             <div class="col-md-4 form-group">
                                     <div class="main-input">
                                         <label for="statusFilterselectBox">Status:</label>    
