@@ -30,7 +30,7 @@ class CatalogController extends Controller
             } elseif (request()->has('search') && request()->input('search.value') !== null) {
                 // If search value is provided, perform search across multiple columns
                 $searchText = request()->input('search.value');
-                $columns = ['title', 'base_price', 'content', 'status', 'publish_date'];
+                $columns = ['title', 'base_price', 'content', 'status', 'publish_date','sku'];
                 $query->where(function($query) use ($columns, $searchText) {
                     foreach ($columns as $column) {
                         $query->orWhere($column, 'like', '%'.$searchText.'%');

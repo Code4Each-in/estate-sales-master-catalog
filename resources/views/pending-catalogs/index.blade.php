@@ -28,7 +28,7 @@
                             <div class="col-md-4 form-group">
                                     <div class="main-input">
                                         <label for="statusFilterselectBox">Status:</label>    
-                                        <select class="form-control" id="statusFilterselectBox" name="status_filter">
+                                        <select class="form-control mx-2" id="statusFilterselectBox" name="status_filter">
                                             <option value="" selected >Select Status</option>
                                             <option value="all" {{ request()->input('status_filter') == 'all' ? 'selected' : '' }} >All</option>
                                             <option value="draft" {{ request()->input('status_filter') == 'draft' ? 'selected' : '' }} >Draft</option>
