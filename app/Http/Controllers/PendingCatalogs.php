@@ -31,6 +31,47 @@ class PendingCatalogs extends Controller
             }
         }
         // $catalogs = PendingCatalog::all();
+        if (request()->ajax()) {
+            $query = PendingCatalog::query();
+
+            if (request()->has('status_filter') && request()->input('status_filter') == 'all') {
+                // If 'status_filter' is 'all', select all records
+                $query->select('*');
+            } elseif (request()->has('status_filter') && request()->input('status_filter')!= '') {
+                // If 'status_filter' is not empty, filter by status
+                $query->where('status', request()->input('status_filter'));
+            } elseif (request()->has('search') && request()->input('search.value') !== null) {
+                // If search value is provided, perform search across multiple columns
+                $searchText = request()->input('search.value');
+                $columns = ['title', 'base_price', 'content', 'status', 'publish_date','master_catalog_id'];
+                $query->where(function($query) use ($columns, $searchText) {
+                    foreach ($columns as $column) {
+                        $query->orWhere($column, 'like', '%'.$searchText.'%');
+                    }
+                });
+            } else {
+                // Default behavior, filter by status 'publish'
+                $query->whereNot('status', 'publish');
+            }
+
+              // Implement server-side pagination
+              $start = request()->input('start', 0);
+              $length = request()->input('length', 10);
+      
+              $totalRecords = $query->count();
+      
+              $data = $query
+                  ->skip($start)
+                  ->take($length)
+                  ->get();
+      
+              return response()->json([
+                  'data' => $data,
+                  'draw' => request()->input('draw', 1),
+                  'recordsTotal' => $totalRecords,
+                  'recordsFiltered' => $totalRecords,
+              ]);
+        }
 
 
         return view('pending-catalogs.index',compact('catalogs','allCatalogsFilter'));
@@ -51,8 +92,6 @@ class PendingCatalogs extends Controller
     {
          //Request Data validation
          $validatedData = $request->validated();
-        //  dd($validatedData);
-
                 //Create User
                 $pendingCatalog = PendingCatalog::create([
                     'author_id' => auth()->user()->id,

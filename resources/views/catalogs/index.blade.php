@@ -19,18 +19,19 @@
                     <!-- <h5 class="card-title">Table with stripped rows</h5> -->
                     <form id="filter-data" method="GET" action="{{ route('catalogs.index') }}">
                         <div class="row mt-3 mx-auto">
-                            <div class="col-md-4 filtersContainer d-flex p-0">
+                            {{-- <div class="col-md-4 filtersContainer d-flex p-0">
                                 <div style="margin-right:20px;">
                                     <input type="checkbox" class="form-check-input" name="all_catalogs" id="all_catalogs"
                                     {{ $allCatalogsFilter == 'on' ? 'checked' : '' }}  > 
                                         <label for="all_catalogs">All</label>
                                 </div>
-                            </div>
-                                <div class="col-md-8 form-group1">
+                            </div> --}}
+                                <div class="col-md-4 form-group">
                                         <div class="main-input">
                                         <label for="statusFilterselectBox">Status:</label>    
                                             <select class="form-control" id="statusFilterselectBox" name="status_filter">
                                                 <option value="" selected >Select Status</option>
+                                                <option value="all" {{ request()->input('status_filter') == 'all' ? 'selected' : '' }} >All</option>
                                                 <option value="draft" {{ request()->input('status_filter') == 'draft' ? 'selected' : '' }} >Draft</option>
                                                 <option value="publish" {{ request()->input('status_filter') == 'publish' ? 'selected' : '' }} >Publish</option>
                                                 <!-- <option value="decline" {{ request()->input('status_filter') == 'decline' ? 'selected' : '' }} >Decline</option> -->               
@@ -62,42 +63,9 @@
                                         <th scope="col">Action</th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    @foreach($catalogs as $index => $data)
-                                    <tr>
-                                        <th scope="row">{{ $index + 1 }}</th>
-                                        <td>{{ucfirst($data->title) ?? ''}}</td>
-                                        <td>${{$data->base_price ?? ''}}</td>
-                                        <td>{{$data->sku ?? 'NA'}}</td>
-                                        <td>{{$data->publish_date ?? 'NA'}}</td>
-                                        <td>
-                                            @if ($data->image)
-                                            <img src="{{ asset('storage/' . $data->image) }}" height="40" width="70" alt="Catalog Image">
-                                            @else
-                                            NA
-                                            @endif
-                                        </td>
-                                        <td>
-                                            @if($data->status == 'draft')
-                                            <span class="badge rounded-pill bg-warning">{{ucfirst($data->status)}}</span>
-                                            @else
-                                            <span class="badge rounded-pill  bg-success">{{ucfirst($data->status)}}</span>
-                                            @endif
-                                        </td>
-                                        <td>
-                                            <a href="{{ url('/catalog/'.$data->id)}}" data-toggle="tooltip" data-placement="left" title="Show Products">
-                                                <i class="fa fa-eye fa-fw pointer btn-fa-catalog"></i>
-                                            </a>
-                                            <i onClick="editCatalogs('{{ $data->id }}')" href="javascript:void(0)" class="fa fa-edit fa-fw pointer btn-fa-catalog"></i>
-
-                                            {{-- <i onClick="deleteCatalogs('{{ $data->id }}')" href="javascript:void(0)" class="fa fa-trash fa-fw pointer btn-fa-catalog"></i> --}}
-
-                                            <i onClick="deleteModal('{{ $data->id }}')" href="javascript:void(0)" class="fa fa-trash fa-fw pointer btn-fa-catalog"></i>
-                                
-                                        </td>
-                                    </tr>
-                                    @endforeach
-                                </tbody>
+                                <!-- <tbody>
+                                  
+                                </tbody> -->
                             </table>
                         </div>
                     </div>
@@ -313,9 +281,7 @@
 <script>
      var catalogsTable;
     $(document).ready(function() {
-        $(function () {
-  $('[data-toggle="tooltip"]').tooltip()
-})
+     
         // $('#catalogs_table').DataTable({
         //     "order": []
 
@@ -335,12 +301,12 @@
                 },
                 { name: 'Title', 
                     render: function (data, type, row) {
-                      return row.title;    
+                      return row.title ?? 'NA';    
                     }
                 },
                 { name: 'Base Price', 
                     render: function (data, type, row) {
-                      return '$'+row.base_price ?? '';    
+                      return '$'+row.base_price ?? 'NA';    
                     }
                 },{ name: 'SKU', 
                     render: function (data, type, row) {
@@ -393,6 +359,9 @@
                 $(row).addClass('row_status_'+data.id); // Add a CSS class to the row
             }
     });
+        $(function () {
+                $('[data-toggle="tooltip"]').tooltip()
+            })
         //hide error bag on modal close
         $(".modal").on("hidden.bs.modal", function() {
             $('.alert-danger').hide().html('');
@@ -487,7 +456,7 @@
     function editCatalogs(id) {
         $('#loader').show(); 
         //fetch category on modal open
-fetchCategoriesForEdit();
+        fetchCategoriesForEdit();
         $('.alert-danger').html('');
         $('#catalog_id').val(id);
         $.ajax({
@@ -613,6 +582,7 @@ fetchCategoriesForEdit();
             })
             .catch(function(error) {
                 console.error(error);
+                $('#loader').hide(); 
             });
     }
 
@@ -632,26 +602,20 @@ fetchCategoriesForEdit();
             })
             .catch(function(error) {
                 console.error(error);
+                $('#loader').hide(); 
             });
     }
+    //Get Records Using Ajax For Status Filter 
+    $("#statusFilterselectBox").change(function() {
+        var selectedValue = $(this).val();
+        // Remove selected attribute from all options
+        $(this).find("option").removeAttr("selected");
 
-        // Event listener for checkbox changes
-        $("#filter-data input:checkbox").change(function() {
-                    // Submit the form
-                    $("#filter-data").submit();
-                });
+        // Set selected attribute for the option with the selected value
+        $(this).find("option[value='" + selectedValue + "']").attr("selected", "selected");
 
-                // Form submission
-                $("#filter-data").submit(function(event) {
-                    // Disable unchecked checkboxes
-                    if (!$("#all_catalogs").prop('checked')) {
-                    $("#all_catalogs").prop('disabled', true);
-                    }
-                });
+        catalogsTable.ajax.url("{{ route('catalogs.index') }}?status_filter=" + selectedValue).load();
+    });
 
-                //Submit form on change the value of Project
-         document.getElementById("statusFilterselectBox").addEventListener("change", function() {
-                    document.getElementById("filter-data").submit();
-                });
 </script>
 @endsection

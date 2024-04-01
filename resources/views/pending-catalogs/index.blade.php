@@ -18,28 +18,30 @@
                     <!-- <h5 class="card-title">Table with stripped rows</h5> -->
                     <form id="filter-data" method="GET" action="{{ route('pending-catalogs.index') }}">
                         <div class="row mt-3 mx-auto">
-                            <div class="col-md-4 filtersContainer d-flex p-0">
+                            {{-- <div class="col-md-4 filtersContainer d-flex p-0">
                                 <div style="margin-right:20px;">
                                     <input type="checkbox" class="form-check-input" name="all_catalogs" id="all_catalogs"
                                     {{ $allCatalogsFilter == 'on' ? 'checked' : '' }}  > 
                                         <label for="all_catalogs">All</label>
-                                </div>
+                                </div> 
+                            </div>--}}
+                            <div class="col-md-4 form-group">
+                                    <div class="main-input">
+                                        <label for="statusFilterselectBox">Status:</label>    
+                                        <select class="form-control" id="statusFilterselectBox" name="status_filter">
+                                            <option value="" selected >Select Status</option>
+                                            <option value="all" {{ request()->input('status_filter') == 'all' ? 'selected' : '' }} >All</option>
+                                            <option value="draft" {{ request()->input('status_filter') == 'draft' ? 'selected' : '' }} >Draft</option>
+                                            <option value="publish" {{ request()->input('status_filter') == 'publish' ? 'selected' : '' }} >Publish</option>
+                                            <option value="decline" {{ request()->input('status_filter') == 'decline' ? 'selected' : '' }} >Decline</option>               
+                                        </select>
+                                    </div>
+                                    @if ($errors->has('status_filter'))
+                                        <span style="font-size: 10px;" class="text-danger">{{ $errors->first('status_filter') }}</span>
+                                    @endif
                             </div>
                         </div>
-                        <div class="col-md-8 form-group1">
-                                <div class="main-input">
-                                    <label for="statusFilterselectBox">Status:</label>    
-                                    <select class="form-control" id="statusFilterselectBox" name="status_filter">
-                                        <option value="" selected >Select Status</option>
-                                        <option value="draft" {{ request()->input('status_filter') == 'draft' ? 'selected' : '' }} >Draft</option>
-                                        <option value="publish" {{ request()->input('status_filter') == 'publish' ? 'selected' : '' }} >Publish</option>
-                                        <option value="decline" {{ request()->input('status_filter') == 'decline' ? 'selected' : '' }} >Decline</option>               
-                                    </select>
-                                </div>
-                                @if ($errors->has('status_filter'))
-                                    <span style="font-size: 10px;" class="text-danger">{{ $errors->first('status_filter') }}</span>
-                                @endif
-                        </div>
+                        
                     </form>
                     <br>
 
@@ -59,44 +61,7 @@
                                         <th scope="col">Action</th>
                                     </tr>
                                 </thead>
-                                <tbody>
-                                    @foreach($catalogs as $index => $data)
-                                    <tr>
-                                        <th scope="row">{{ $index + 1 }}</th>
-                                        <td>{{ucfirst($data->title) ?? ''}}</td>
-                                        <td>{{$data->catalog_id ?? 'Null'}}</td>
-                                        <td>{{ $data->base_price !== null ? '$' . $data->base_price : '' }}</td>
-                                        <td>{{$data->publish_date ?? 'NA'}}</td>
-                                        <td>
-                                        @if ($data->image)
-                                            @if (Str::startsWith($data->image, ['http://', 'https://']))
-                                                <a href="{{ $data->image }}" target="_blank">
-                                                    <img src="{{ $data->image }}" height="40" width="70" alt="Catalog Image">
-                                                </a>
-                                            @else
-                                                <img src="{{ asset('storage/' . $data->image) }}" height="40" width="70" alt="Catalog Image">
-                                            @endif
-                                        @else
-                                            NA
-                                        @endif
-                                        </td>
-                                        <td>
-                                            @if($data->status == 'draft')
-                                            <span class="badge rounded-pill bg-warning">{{ucfirst($data->status)}}</span>
-                                            @else
-                                            <span class="badge rounded-pill  bg-success">{{ucfirst($data->status)}}</span>
-                                            @endif
-                                        </td>
-                                        <td>
-                                            <!-- <i onClick="editCatalogs('{{ $data->id }}')" href="javascript:void(0)" class="fa fa-edit fa-fw pointer btn-fa-catalog"></i> -->
-
-                                            <!-- <i onClick="deleteModal('{{ $data->id }}')" href="javascript:void(0)" class="fa fa-trash fa-fw pointer btn-fa-catalog"></i> -->
-
-                                            <a onClick="editCatalogs('{{ $data->id }}')" href="javascript:void(0)" class="fa fa-eye btn-fa-catalog" data-toggle="tooltip" data-placement="left" title="View"></a>
-                                        </td>
-                                    </tr>
-                                    @endforeach
-                                </tbody>
+                               
                             </table>
                         </div>
                     </div>
@@ -333,14 +298,103 @@
 @endsection
 @section('custom_js')
 <script>
+    var pendingCatalogsTable;
     $(document).ready(function() {
         $(function () {
              $('[data-toggle="tooltip"]').tooltip()
         });
-        $('#pending_catalogs_table').DataTable({
-            "order": []
+        // $('#pending_catalogs_table').DataTable({
+        //     "order": []
+        // });<th scope="col">#</th>
 
-        });
+        pendingCatalogsTable = $('#pending_catalogs_table').DataTable({
+            processing: true,
+            serverSide: true,
+            tooltip:true,
+            ajax: "{{ route('pending-catalogs.index') }}",
+            paging: true, // Enable server-side pagination
+            pageLength: 10, // Initial number of entries per page
+            columns: [
+                { name: 'Id', 
+                    render: function (data, type, row) {
+                      return row.id;    
+                    }
+                },
+                { name: 'Title', 
+                    render: function (data, type, row) {
+                      return row.title ?? 'NA';    
+                    }
+                },
+                { name: 'Catalog Id', 
+                    render: function (data, type, row) {
+                      return row.master_catalog_id ?? 'NA';    
+                    }
+                },
+                { name: 'Base Price', 
+                    render: function (data, type, row) {
+                        // Assuming row is an object representing a data row
+                    var basePrice = row.base_price;
+
+                     // Check if basePrice exists and is not null or undefined
+                        if (basePrice !== null && basePrice !== undefined) {
+                            return '$' + basePrice;
+                        } else {
+                            return 'NA';
+                        }
+                    }
+                },
+                { name: 'Publish Date', 
+                    render: function (data, type, row) {
+                      return row.publish_date ?? 'NA';    
+                    }
+                },
+                {
+                    name: 'Image',
+                    render: function(data, type, row) {
+                        var image = "NA";
+                        if (row.image) {
+                            if (row.image.startsWith('http://') || row.image.startsWith('https://')) {
+                                image = '<a href="' + row.image + '" target="_blank">' +
+                                            '<img src="' + row.image + '" height="40" width="70" alt="Catalog Image">' +
+                                        '</a>';
+                            } else {
+                                image = '<img src="{{ asset('storage') }}/' + row.image + '" height="40" width="70" alt="Catalog Image">';
+                            }
+                        }
+                        return image;
+                    }
+                },
+                { name: 'Status', 
+                    render: function (data, type, row) {
+                        if (row.status === 'draft') {
+                            return '<span class="badge rounded-pill bg-warning">Draft</span>';
+                        } else if (row.status === 'publish') {
+                            return '<span class="badge rounded-pill bg-success">Publish</span>';
+                        } else if (row.status === 'decline') {
+                            return '<span class="badge rounded-pill bg-danger">Decline</span>';
+                        } else {
+                            return '----';
+                        }   
+                    }
+                },
+                {
+                    name: 'Action',
+                    orderable: false,
+                    searchable: false,
+                    render: function(data, type, row) {
+                        var action = '';
+                        action += '<a onClick="editCatalogs(\'' + row.id + '\')" href="javascript:void(0)" class="fa fa-eye btn-fa-catalog" data-toggle="tooltip" data-placement="left" title="View"></a>';
+                        
+                        return action;
+                    }
+                }
+
+
+            ],
+            rowCallback: function (row, data) {
+                $(row).addClass('row_status_'+data.id); // Add a CSS class to the row
+            }
+    });
         //hide error bag on modal close
         $(".modal").on("hidden.bs.modal", function() {
             $('.alert-danger').hide().html('');
@@ -470,7 +524,7 @@
         } else {
             status = 'publish';
         }
-        if (confirm("Are you sure You Want To Continue to "+status+" Catalog ?")) {
+        if (confirm("Are you sure you want to continue to "+status+" catalog ?")) {
 
             // var imageFile = $('#edit_image')[0].files[0];
             var formData = new FormData(this);
@@ -481,7 +535,7 @@
                 formData.append('image', imageFile);
             }
             // formData.append('image',imageFile);
-            $.ajax({
+            $.ajax({ 
                 type: "POST",
                 url: `{{ route('pending-catalogs.update', ['catalog' => ':id']) }}`.replace(':id', id),
                 data: formData,
@@ -677,9 +731,21 @@
         });
 
             //Submit form on change the value of Project
-            document.getElementById("statusFilterselectBox").addEventListener("change", function() {
-                    document.getElementById("filter-data").submit();
-                });
+            // document.getElementById("statusFilterselectBox").addEventListener("change", function() {
+            //         document.getElementById("filter-data").submit();
+            //     });
+
+     //Get Records Using Ajax For Status Filter 
+     $("#statusFilterselectBox").change(function() {
+        var selectedValue = $(this).val();
+        // Remove selected attribute from all options
+        $(this).find("option").removeAttr("selected");
+
+        // Set selected attribute for the option with the selected value
+        $(this).find("option[value='" + selectedValue + "']").attr("selected", "selected");
+
+        pendingCatalogsTable.ajax.url("{{ route('pending-catalogs.index') }}?status_filter=" + selectedValue).load();
+    });
 
 </script>
 @endsection
