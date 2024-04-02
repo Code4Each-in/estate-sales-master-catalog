@@ -12,14 +12,7 @@
                     <!-- <h5 class="card-title">Table with stripped rows</h5> -->
                     <form id="filter-data-form" method="GET" action="{{ route('users.index') }}">
                         <div class="row mt-3 mx-auto">
-                            <div class="col-md-4 filtersContainer d-flex p-0">
-                                <div style="margin-right:20px;">
-                                    <input type="checkbox" class="form-check-input" name="all_users" id="all_users"
-                                    {{ $allUsersFilter == 'on' ? 'checked' : '' }}  > 
-                                        <label for="all_users">All</label>
-                                </div>
-                            </div>
-                            <div class="col-md-8 form-group1">
+                            <div class="col-md-4 form-group1">
                                     <div class="main-input">
                                         <label for="roleFilterselectBox">Role:</label>
                                    
@@ -52,29 +45,7 @@
                                         <th scope="col">Status</th>
                                         <th scope="col">Action</th>
                                     </tr>
-                                </thead>
-                                <tbody>
-                                @foreach($users as $index => $data)
-                                    <tr>
-                                        <th scope="row">{{ $index + 1 }}</th>
-                                        <td>{{ucfirst($data->first_name) ?? ''}} {{ucfirst($data->last_name) ?? ''}}</td>
-                                        <td>{{$data->email ?? ''}}</td>
-                                        <td>{{$data->phone}}</td>
-                                        <td>{{$data->role->name ?? ''}}</td>
-                                        <td>
-                                             @if($data->status == 'inactive')
-                                            <span class="badge rounded-pill bg-danger">{{ucfirst($data->status)}}</span>
-                                            @else
-                                            <span class="badge rounded-pill  bg-success">{{ucfirst($data->status)}}</span>
-                                            @endif
-                                        </td>
-                                        <td> 
-                                            <i onClick="editUsers('{{ $data->id }}')" href="javascript:void(0)" class="fa fa-edit fa-fw pointer btn-fa-catalog"></i>
-
-                                            <i onClick="deleteUsers('{{ $data->id }}')" href="javascript:void(0)" class="fa fa-trash fa-fw pointer btn-fa-catalog"></i></td>
-                                    </tr>
-                                    @endforeach
-                                </tbody>
+                                </thead>                  
                             </table>
                         </div>
                     </div>
@@ -252,12 +223,72 @@
 @endsection
 @section('custom_js')
 <script>
+    var usersTable;
     $(document).ready(function() {
 
-        $('#users_table').DataTable({
-            "order": []
+        // $('#users_table').DataTable({
+        //     "order": []
 
-        });
+        // });
+        usersTable = $('#users_table').DataTable({
+            processing: true,
+            serverSide: true,
+            ajax: "{{ route('users.index') }}",
+            paging: true, // Enable server-side pagination
+            pageLength: 10, // Initial number of entries per page
+            columns: [
+                { name: 'Id', 
+                    render: function (data, type, row) {
+                      return row.id;    
+                    }
+                },
+                { name: 'Name', 
+                    render: function (data, type, row) {
+                        return (row.first_name ? row.first_name + ' ' : '') + (row.last_name ? row.last_name : '');    
+                    }
+                },
+                { name: 'Email', 
+                    render: function (data, type, row) {
+                      return row.email ?? 'NA';    
+                    }
+                },
+                { name: 'Phone', 
+                    render: function (data, type, row) {
+                      return row.phone ?? 'NA';    
+                    }
+                },{ name: 'Role', 
+                    render: function (data, type, row) {
+                      return row.role.name ?? 'NA';    
+                    }
+                },
+                { name: 'Status', 
+                    render: function (data, type, row) {
+                        if (row.status === 'active') {
+                            return '<span class="badge rounded-pill bg-success">Active</span>';
+                        } else if (row.status === 'inactive') {
+                            return '<span class="badge rounded-pill bg-danger">Inactive</span>';
+                        } else {
+                            return '----';
+                        }   
+                    }
+                },
+                {
+                    name: 'Action',
+                    orderable: false,
+                    searchable: false,
+                    render: function(data, type, row) {
+                        var action = '';
+                        action += '<i onClick="editUsers(\'' + row.id + '\')" href="javascript:void(0)" class="fa fa-edit fa-fw pointer btn-fa-catalog"></i>';
+                        action += '<i onClick="deleteUsers(\'' + row.id + '\')" href="javascript:void(0)" class="fa fa-trash fa-fw pointer btn-fa-catalog"></i>';
+                        return action;
+                    }
+                }
+
+            ],
+            rowCallback: function (row, data) {
+                $(row).addClass('row_status_'+data.id); // Add a CSS class to the row
+            }
+    });
         //hide error bag on modal close
         $(".modal").on("hidden.bs.modal", function() {
             $('.alert-danger').hide().html('');
@@ -410,13 +441,13 @@
 
     function deleteUsers(id) {
         if (confirm("Are you sure ?")) {
-            var token = $('meta[name="csrf-token"]').attr('content'); // Retrieve CSRF token from meta tag
+            var token = $('meta[name="csrf-token"]').attr('content');
 
             $.ajax({
                 type: "DELETE",
                 url: `{{ route('users.destroy', ['user' => ':id']) }}`.replace(':id', id),
                 data: {
-                    _token: token, // Include CSRF token in the request data
+                    _token: token,
                     id: id
                 },
                 dataType: 'json',
@@ -430,24 +461,17 @@
         }
     }
 
-       // Event listener for checkbox changes
-       $("#all_users").change(function() {
-            // Submit the form
-            $("#filter-data-form").submit();
-        });
+             //Get Records Using Ajax For Status Filter 
+     $("#roleFilterselectBox").change(function() {
+        var selectedValue = $(this).val();
+        // Remove selected attribute from all options
+        $(this).find("option").removeAttr("selected");
 
-        // Form submission
-        // $("#filter-data-form").submit(function(event) {
-        //     // Disable unchecked checkboxes
-        //     if (!$("#all_catalogs").prop('checked')) {
-        //     $("#all_catalogs").prop('disabled', true);
-        //     }
-        // });
+        // Set selected attribute for the option with the selected value
+        $(this).find("option[value='" + selectedValue + "']").attr("selected", "selected");
 
-         //Submit form on change the value of Project
-         document.getElementById("roleFilterselectBox").addEventListener("change", function() {
-                    document.getElementById("filter-data-form").submit();
-                });
+        usersTable.ajax.url("{{ route('users.index') }}?role_filter=" + selectedValue).load();
+    });
 
 </script>
 @endsection
