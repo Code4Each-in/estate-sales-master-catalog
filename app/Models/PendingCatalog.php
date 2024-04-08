@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Catalog extends Model
+class PendingCatalog extends Model
 {
     use HasFactory, SoftDeletes;
 
@@ -20,6 +20,7 @@ class Catalog extends Model
         'base_price',
         'status',
         'image',
-        'publish_date'
+        'publish_date',
+        'master_catalog_id'
     ];
 }

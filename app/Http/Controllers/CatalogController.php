@@ -18,10 +18,51 @@ class CatalogController extends Controller
      */
     public function index()
     {    
-        $catalogs = Catalog::all();
-
-        return view('catalogs.index',compact('catalogs'));
+        if (request()->ajax()) {
+            $query = Catalog::query();
+    
+            if (request()->has('status_filter') && request()->input('status_filter') == 'all') {
+                // If 'status_filter' is 'all', select all records
+                $query->select('*');
+            } elseif (request()->has('status_filter') && request()->input('status_filter')!= '') {
+                // If 'status_filter' is not empty, filter by status
+                $query->where('status', request()->input('status_filter'));
+            } elseif (request()->has('search') && request()->input('search.value') !== null) {
+                // If search value is provided, perform search across multiple columns
+                $searchText = request()->input('search.value');
+                $columns = ['title', 'base_price', 'content', 'status', 'publish_date','sku'];
+                $query->where(function($query) use ($columns, $searchText) {
+                    foreach ($columns as $column) {
+                        $query->orWhere($column, 'like', '%'.$searchText.'%');
+                    }
+                });
+            } else {
+                // Default behavior, filter by status 'publish'
+                $query->where('status', 'publish');
+            }
+    
+            // Implement server-side pagination
+            $start = request()->input('start', 0);
+            $length = request()->input('length', 10);
+    
+            $totalRecords = $query->count();
+    
+            $data = $query
+                ->skip($start)
+                ->take($length)
+                ->get();
+    
+            return response()->json([
+                'data' => $data,
+                'draw' => request()->input('draw', 1),
+                'recordsTotal' => $totalRecords,
+                'recordsFiltered' => $totalRecords,
+            ]);
+        }
+    
+        return view('catalogs.index');
     }
+    
 
     /**
      * Show the form for creating a new resource.
@@ -63,7 +104,6 @@ class CatalogController extends Controller
                 $uploadedFile->storeAs('public/Catalogs', $filename);
                 $path = 'Catalogs/' . $filename;
                 Catalog::where('id', $catalog->id)->update(['image' => $path]);
-
         }
 
         $request->session()->flash('message','Catalog Saved Successfully.');
@@ -261,13 +301,10 @@ class CatalogController extends Controller
 
     private function getProducts($id = null)
     {
-        $consumerKey = env('CONSUMER_KEY');
-        $consumerSecret = env('CONSUMER_SECRET');
         $apiUrl = rtrim(env('WORDPRESS_URL'), '/') . '/wp-json/custom/v3/products-by-meta';
     
         try {
-            $response = Http::withBasicAuth($consumerKey, $consumerSecret)
-                ->withoutVerifying()
+            $response = Http::withoutVerifying()
                 ->get($apiUrl, ['cat_id' => $id]);
     
             // Check if the request was successful

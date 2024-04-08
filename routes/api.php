@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\CatalogController;
+use App\Http\Controllers\Api\PendingCatalogController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -21,6 +22,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::middleware('custom.token')->group(function () {
     Route::get('get-catalog-detail',[CatalogController::class,'getCatalogDetail']);
-
+    Route::get('fetch-detail-catalogs-by-id',[CatalogController::class,'fetchCatalogsDetailWithStatusByIds']);
+    Route::post('save-pending-catalog',[PendingCatalogController::class,'savePendingCatalog']);
+    
 });
 

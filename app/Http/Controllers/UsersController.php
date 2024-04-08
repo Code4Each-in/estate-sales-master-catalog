@@ -17,19 +17,87 @@ class UsersController extends Controller
      */
     public function index()
     {
-        $loginUser = auth()->user();
-        //Get Roles For User Without Super Admin
+        // $usersFilter = request()->all() ;
+        // $allUsersFilter = $usersFilter['all_users'] ?? '';
+        // $rolesFilter =  $rolesFilter['role_filter'] ?? '';
+     
+  //Get Roles For User Without Super Admin
         $roles = Role::whereNot('name','SUPER_ADMIN')->get();
-        //Get Users Without Super Admin
-        if($loginUser->role->name == 'SUPER_ADMIN'){
-            $users = User::with('role')->whereHas('role', function($q) {
+        // $loginUser = auth()->user();
+      
+        // //Get Users Without Super Admin
+        // if($loginUser->role->name == 'SUPER_ADMIN'){
+        //     $users = User::with('role')->whereHas('role', function($q) {
+        //         $q->where('name', '!=', 'SUPER_ADMIN');
+        //     });
+        //     if(!$allUsersFilter  == 'on'){
+        //         $users = $users->where('status','active');
+        //     }
+           
+        //     if (request()->has('role_filter') && request()->input('role_filter')!= '') {
+        //         $users = $users->whereHas('role', function($query) { 
+        //             $query->where('id', request()->input('role_filter')); 
+        //         });
+        //     }
+
+        //    $users = $users->get();
+            
+        // }else{
+        //     $users = [];
+        // }
+
+        if (request()->ajax()) {
+            $query = User::with('role')->whereHas('role', function($q) {
                 $q->where('name', '!=', 'SUPER_ADMIN');
-            })->get();
-        }else{
-            $users = [];
+            });
+
+            // if (request()->has('status_filter') && request()->input('status_filter') == 'all') {
+            //     // If 'status_filter' is 'all', select all records
+            //     $query->select('*');
+            // } else
+            if (request()->has('role_filter') && request()->input('role_filter')!= '') {
+                // If 'status_filter' is not empty, filter by status
+                $query->whereHas('role', function($q) { 
+                    $q->where('id', request()->input('role_filter')); 
+                });
+                // $query->where('status', request()->input('status_filter'));
+            } elseif (request()->has('search') && request()->input('search.value') !== null) {
+                // If search value is provided, perform search across multiple columns
+                $searchText = request()->input('search.value');
+                $columns = ['first_name', 'last_name','email', 'phone', 'status'];
+                $query->where(function($query) use ($columns, $searchText) {
+                    foreach ($columns as $column) {
+                        $query->orWhere($column, 'like', '%'.$searchText.'%');
+                    }
+                })->orWhereHas('role', function($q) use ($searchText) {
+                    $q->where('name', 'like', '%'.$searchText.'%')->whereNot('name','SUPER_ADMIN');
+                });
+            } 
+            // else {
+            //     // Default behavior, filter by status 'publish'
+            //     $query->whereNot('status', 'publish');
+            // }
+
+              // Implement server-side pagination
+              $start = request()->input('start', 0);
+              $length = request()->input('length', 10);
+      
+              $totalRecords = $query->count();
+      
+              $data = $query
+                  ->skip($start)
+                  ->take($length)
+                  ->get();
+      
+              return response()->json([
+                  'data' => $data,
+                  'draw' => request()->input('draw', 1),
+                  'recordsTotal' => $totalRecords,
+                  'recordsFiltered' => $totalRecords,
+              ]);
         }
         
-        return view('users.index',compact('users','roles'));
+        return view('users.index',compact('roles'));
     }
 
     /**

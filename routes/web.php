@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CatalogController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\PendingCatalogs;
 use App\Http\Controllers\UsersController;
 use Illuminate\Support\Facades\Route;
 
@@ -48,6 +49,12 @@ Route::group(['middleware' => ['auth']], function() {
         Route::delete('/catalogs/delete/{catalog}',[CatalogController::class,'destroy'])->name('catalogs.destroy');
         Route::get('/catalog/{id}',[CatalogController::class,'show'])->name('catalogs.show');
 
+        Route::get('/pending-catalogs', [PendingCatalogs::class,'index'])->name('pending-catalogs.index');
+        Route::post('/pending-catalogs/add/',[PendingCatalogs::class,'store']);
+        Route::get('/pending-catalogs/edit/{id}',[PendingCatalogs::class,'edit'])->name('pending-catalogs.edit');
+        Route::post('/pending-catalogs/{catalog}',[PendingCatalogs::class,'update'])->name('pending-catalogs.update');
+        Route::delete('/pending-catalogs/delete/{catalog}',[PendingCatalogs::class,'destroy'])->name('pending-catalogs.destroy');
+        Route::post('/pending-catalogs-publish',[PendingCatalogs::class,'publishPendingCatalog'])->name('pending-catalogs.publish');
 
         Route::get('/fetch-catalog-categories', [CatalogController::class,'fetchCategories']);
 

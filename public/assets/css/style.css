@@ -1316,3 +1316,56 @@ header .header-alert{
   color: #231911;
   /* background-color: #231911; */
 }
+
+#loader {
+  display: none;
+  position:fixed;
+  z-index:99999;
+  top:0;
+  left:0;
+  bottom:0;
+  right:0;
+  background:rgba(0,0,0,70%);
+  transition: 1s 0.4s;
+}
+.loader-spinner{
+
+  width: 65px;
+  height: 65px;
+  position: absolute;
+  top: 40%;
+  left: 45%;
+
+}
+
+.text-wrapper {
+  display: flex;
+  justify-content: flex-end;
+  margin: 0px auto;
+  align-items: center;
+  width: 100%;
+}
+
+a.text {
+  color: #000;
+  font-size: 20px;
+  font-weight: 600;
+}
+a.text:hover {
+  color: #932828;
+}
+
+.main-input {
+  display: flex;
+  width: 50%;
+  / margin: 0px auto; /
+  flex-wrap: nowrap;
+  align-content: center;
+  align-items: center;
+}
+.col-md-8.form-group1 {
+  display: flex;
+  justify-content: end;
+  margin: 0px auto;
+  / width: 47%; /
+}
