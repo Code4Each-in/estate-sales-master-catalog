@@ -1369,3 +1369,7 @@ a.text:hover {
   margin: 0px auto;
   / width: 47%; /
 }
+
+img#edit_image5 {
+  width: 120px;
+}

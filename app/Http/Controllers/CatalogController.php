@@ -10,6 +10,8 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class CatalogController extends Controller
 {
@@ -104,6 +106,7 @@ class CatalogController extends Controller
                 $uploadedFile->storeAs('public/Catalogs', $filename);
                 $path = 'Catalogs/' . $filename;
                 Catalog::where('id', $catalog->id)->update(['image' => $path]);
+
         }
 
         $request->session()->flash('message','Catalog Saved Successfully.');
@@ -324,5 +327,248 @@ class CatalogController extends Controller
             return null; // Return null or handle exception as needed
         }
     }
+
+    public function exportCSV()
+    {
+                   
+        $filename = 'employee-data.csv';
+    
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => "attachment; filename=\"$filename\"",
+            'Pragma' => 'no-cache',
+            'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+            'Expires' => '0',
+        ];
+    
+        return response()->stream(function () {
+            $handle = fopen('php://output', 'w');
+    
+          //  Add CSV headers
+            fputcsv($handle, [
+                'id',
+                'Author Name',
+                'Title',
+                'Base price',
+                'SKU',
+                'Publish Date',
+                'Image',
+                'Status'
+            ]);
+    
+           //  Fetch and process data in chunks
+             Catalog::chunk(25, function ($employees) use ($handle) {
+                foreach ($employees as $employee) {
+
+                    $author = DB::table('users')
+                     ->where('id', $employee->author_id)
+                     ->get();
+                  
+
+            
+               $image_url =  url('/storage')."/".$employee->image;
+           //  Extract data from each employee.
+                    $data = [
+                        isset($employee->id)? $employee->id : '',
+                        isset($author[0]->first_name)? $author[0]->first_name : '',
+                        isset($employee->title)? $employee->title : '',
+                        isset($employee->base_price)? $employee->base_price : '',
+                        isset($employee->sku)? $employee->sku : '',
+                        isset($employee->publish_date)? $employee->publish_date : '',
+                        isset($image_url)? $image_url : '',
+                        isset($employee->status)? $employee->status : ''
+                      
+                    ];
+    
+           //  Write data to a CSV file.
+                   fputcsv($handle, $data);
+               }
+           });
+    
+           // Close CSV file handle
+           fclose($handle);
+        }, 200, $headers);
+    }
+
+    public function download_csv()
+    {     $filename = 'employee-data.csv';
+    
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => "attachment; filename=\"$filename\"",
+            'Pragma' => 'no-cache',
+            'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+            'Expires' => '0',
+        ];
+    
+        return response()->stream(function () {
+            $handle = fopen('php://output', 'w');
+    
+          //  Add CSV headers
+            fputcsv($handle, [
+                'Author Name',
+                'Title',
+                'Base price',
+                'SKU',
+                'Publish Date',
+                'Image',
+                'Status'
+            ]);
+    
+
+
+                
+           //  Extract data from each employee.
+                   $id = '';
+                    $data = [
+                        ($id),
+                        ($id),
+                        ($id),
+                        ($id),
+                        ($id),
+                        ($id),
+                        ($id),
+                      
+                    ];
+    
+           //  Write data to a CSV file.
+                   fputcsv($handle, $data);
+      
+    
+           // Close CSV file handle
+           fclose($handle);
+        }, 200, $headers);
+    }
+
+    public function importCSV(Request $request)
+    {
+      // dd($request);
+      $auth =   $request->validate([
+            'import_csv' => 'required',
+        ]);
+    
+        //read csv file and skip data
+        $file = $request->file('import_csv');
+        $handle = fopen($file->path(), 'r');
+
+        //skip the header row
+       fgetcsv($handle);
+
+       $chunksize = 25;
+       while(!feof($handle))
+       {
+            $chunkdata = [];
+
+            for($i = 0; $i<$chunksize; $i++)
+            {
+                $data = fgetcsv($handle);
+                if($data === false)
+                {
+                    break;
+                }
+                $chunkdata[] = $data; 
+            }
+
+           $this->getchunkdata($chunkdata);
+       }
+         fclose($handle);
+
+        return redirect()->route('catalogs.index')->with('success', 'Data has been added successfully.');
+    }
+
+    public function getchunkdata($chunkdata)
+    {
+        foreach($chunkdata as $column){
+            $title = $column[0];
+            $base_price = $column[1];
+            $sku = $column[2];
+            $publish_date = $column[3];
+            $publish_date =  date('Y-m-d', strtotime($publish_date));
+            $image = $column[4];
+            $status = $column[5];
+           
+     
+           // upload image in folder  
+//---------------------------------------------------------------------------------------
+            if(empty($image))
+            {
+                $employee = new Catalog();
+                $employee->title = $title;
+                $employee->base_price = $base_price;
+                $employee->sku = $sku;
+                $employee->publish_date = $publish_date;
+                $employee->image = '';
+                $employee->status = $status;
+                $employee->save();
+            } else{
+            
+
+                // Original image URL
+                
+                // Extracting filename from URL
+                $filename = uniqid() . '_' . basename($image);
+                
+                
+                // Initialize cURL session
+                $ch = curl_init($image);
+                
+                // Set options
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // Disabling SSL verification (not recommended in production)
+                
+                // Fetching image content from URL
+                $imageContent = curl_exec($ch);
+                
+                // Checking if image content was retrieved successfully
+                if ($imageContent === false) {
+                    throw new \Exception('Failed to retrieve image content from URL');
+                }
+                
+                // Close cURL session
+                curl_close($ch);
+                
+              $saveDirectory = storage_path('\app\public\Catalogs');
+             
+          
+                if (!is_dir($saveDirectory)) {
+                    mkdir($saveDirectory, 0755, true); // Creating directory if it doesn't exist
+                }
+                
+              //  Full file path to save the image
+               $filePath = $saveDirectory . '/' . $filename;
+                
+               // Saving image content to file
+               $saved = file_put_contents($filePath, $imageContent);
+               
+                
+               // Checking if image file was saved successfully
+                if ($saved === false) {
+                    throw new \Exception('Failed to save image file');
+                }
+             
+                
+                // Returning the file path if successful, otherwise null
+                 
+
+                $employee = new Catalog();
+                $employee->title = $title;
+                $employee->base_price = $base_price;
+                $employee->sku = $sku;
+                $employee->publish_date = $publish_date;
+                $employee->image = "Catalogs/".$filename;
+                $employee->status = $status;
+               $employee->save();
+
+               return $saved ? $filePath : null; 
+            }
+      
+
+//-------------------------------------------------------------------------------------------
+    
+       
+        }
+    }
+
+    
     
 }
