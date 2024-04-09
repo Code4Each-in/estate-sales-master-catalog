@@ -16,6 +16,21 @@
                 
                 <div class="card-body">
                     <button class="btn btn-default my-3" onClick="openCatalogModal()" href="javascript:void(0)">Add Catalog</button>
+                  <a href="{{url('download_csv')}}"><button class="btn btn-default my-3"  href="javascript:void(0)">Download CSV Format</button></a>
+                  <a href="{{url('export')}}"><button class="btn btn-default my-3" onClick="" href="javascript:void(0)">Export CSV</button></a>
+                  <form action="{{ url('importCSV') }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                <div class="messages">
+                </div>
+                <div class="fields">
+                    <div class="input-group mb-3">
+                        <input type="file" class="form-control" id="import_csv" name="import_csv" accept=".csv">
+                        <!-- <label class="input-group-text" for="import_csv">Upload</label> -->
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-success">Import CSV</button>
+            </form>
+                  
                     <!-- <h5 class="card-title">Table with stripped rows</h5> -->
                     <form id="filter-data" method="GET" action="{{ route('catalogs.index') }}">
                         <div class="row mt-3 mx-auto">
@@ -210,7 +225,9 @@
                                         <label for="edit_image" class="col-sm-3 col-form-label">Image</label>
                                         <div class="col-sm-9">
                                             <input type="file" class="form-control" name="image" id="edit_image">
+                                            <img src="" height="80" width="40" alt="Catalog Image" id="edit_image5" class="mt-3">
                                         </div>
+                                       
                                     </div>
                                     <!-- <div class="row mb-3">
                                             <label for="date" class="col-sm-3 col-form-label required">Date</label>
@@ -457,6 +474,7 @@
             url: "{{ url('/catalogs/edit') }}" + '/' + id,
             dataType: 'json',
             success: (res) => {
+               
                 if (res.catalogs != null) {
                     $('#editCatalogs').modal('show');
                     $('#edit_name').val(res.catalogs.name);
@@ -467,6 +485,9 @@
                     $('#edit_status option[value="' + res.catalogs.status + '"]').attr('selected',
                         'selected');
                     $('#edit_category').val(res.catalogs.wp_category_id).trigger('change');
+                    
+                    var url =   {!! json_encode(url('/storage/')) !!} + '/'+ res.catalogs.image;
+                    $('#edit_image5').attr({src: url});
                     // $("#edit_category").select2('val',res.catalogs.wp_category_id);
                     // $('#edit_category').select2().val(225).trigger('change');
                 }
