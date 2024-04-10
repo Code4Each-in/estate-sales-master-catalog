@@ -538,7 +538,7 @@ class CatalogController extends Controller
                 // Close cURL session
                 curl_close($ch);
                 
-              $saveDirectory = storage_path('app\public\Catalogs');
+              $saveDirectory = storage_path('/app/public/Catalogs');
              
           
                 if (!is_dir($saveDirectory)) {
