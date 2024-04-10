@@ -1373,3 +1373,21 @@ a.text:hover {
 img#edit_image5 {
   width: 120px;
 }
+.choose-form {
+  display: flex;
+  gap: 15px;
+  margin: 0px auto;
+  width: 100%;
+  align-items: baseline;
+  justify-content: flex-end;
+}
+button.btn.btn-success.cate-btn {
+  display: flex;
+  padding: 5px 13px;
+  height: auto;
+  align-items: center;
+}
+.export_outer_cont {
+  display: flex;
+  justify-content: space-between;
+}
