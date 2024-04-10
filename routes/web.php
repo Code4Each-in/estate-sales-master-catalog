@@ -59,7 +59,8 @@ Route::group(['middleware' => ['auth']], function() {
         Route::get('/fetch-catalog-categories', [CatalogController::class,'fetchCategories']);
         
         // Export csv file
-        Route::get('/export', [CatalogController::class,'exportCSV']);
+         Route::get('/export', [CatalogController::class,'exportCSV'])->name('export.index');
+       
         //Import csv file
         Route::post('importCSV', [CatalogController::class, 'importCSV']);
         // Download  CSV Format

@@ -328,10 +328,13 @@ class CatalogController extends Controller
         }
     }
 
-    public function exportCSV()
+    public function exportCSV(Request $request)
     {
-                   
-        $filename = 'employee-data.csv';
+    
+             $statusFilter5 = $request->query('status_filter');
+    
+       
+        $filename = 'Catalog-data.csv';
     
         $headers = [
             'Content-Type' => 'text/csv',
@@ -340,8 +343,9 @@ class CatalogController extends Controller
             'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
             'Expires' => '0',
         ];
-    
-        return response()->stream(function () {
+  
+        return response()->stream(function () use ($statusFilter5) {
+       // return response()->stream(function () {
             $handle = fopen('php://output', 'w');
     
           //  Add CSV headers
@@ -355,17 +359,27 @@ class CatalogController extends Controller
                 'Image',
                 'Status'
             ]);
+        
     
-           //  Fetch and process data in chunks
-             Catalog::chunk(25, function ($employees) use ($handle) {
-                foreach ($employees as $employee) {
+                  //  Fetch and process data in chunks
 
+                        $query = DB::table('catalogs');
+                        if ((!empty($statusFilter5)) && $statusFilter5 !== "all") {
+                            $query->where('status', '=', $statusFilter5);
+                        }
+                        $employees = $query->get();
+                  
+                    
+
+             // DB::table('catalogs')->where('status', '=', $statusFilter5)->chunk(25, function ($employees) use ($handle) {
+           //Catalog::where('status', '=', $statusFilter5)->chunk(25, function ($employees) use ($handle) {
+       
+            // Catalog::chunk(25, function ($employees) use ($handle) {
+                foreach ($employees as $employee) {
                     $author = DB::table('users')
                      ->where('id', $employee->author_id)
                      ->get();
                   
-
-            
                $image_url =  url('/storage')."/".$employee->image;
            //  Extract data from each employee.
                     $data = [
@@ -383,7 +397,7 @@ class CatalogController extends Controller
            //  Write data to a CSV file.
                    fputcsv($handle, $data);
                }
-           });
+          // });
     
            // Close CSV file handle
            fclose($handle);
@@ -391,7 +405,7 @@ class CatalogController extends Controller
     }
 
     public function download_csv()
-    {     $filename = 'employee-data.csv';
+    {     $filename = 'Catalog-data.csv';
     
         $headers = [
             'Content-Type' => 'text/csv',
@@ -406,7 +420,7 @@ class CatalogController extends Controller
     
           //  Add CSV headers
             fputcsv($handle, [
-                'Author Name',
+                
                 'Title',
                 'Base price',
                 'SKU',
@@ -421,7 +435,7 @@ class CatalogController extends Controller
            //  Extract data from each employee.
                    $id = '';
                     $data = [
-                        ($id),
+                      
                         ($id),
                         ($id),
                         ($id),
@@ -473,7 +487,7 @@ class CatalogController extends Controller
        }
          fclose($handle);
 
-        return redirect()->route('catalogs.index')->with('success', 'Data has been added successfully.');
+        return redirect()->route('catalogs.index')->with('success', 'CSV File Uploaded Successfully');
     }
 
     public function getchunkdata($chunkdata)
@@ -503,7 +517,7 @@ class CatalogController extends Controller
             } else{
             
 
-                // Original image URL
+              
                 
                 // Extracting filename from URL
                 $filename = uniqid() . '_' . basename($image);
@@ -545,8 +559,6 @@ class CatalogController extends Controller
                 if ($saved === false) {
                     throw new \Exception('Failed to save image file');
                 }
-             
-                
                 // Returning the file path if successful, otherwise null
                  
 
@@ -557,18 +569,11 @@ class CatalogController extends Controller
                 $employee->publish_date = $publish_date;
                 $employee->image = "Catalogs/".$filename;
                 $employee->status = $status;
-               $employee->save();
+                $employee->save();
 
                return $saved ? $filePath : null; 
             }
-      
-
 //-------------------------------------------------------------------------------------------
-    
-       
         }
-    }
-
-    
-    
+    }   
 }

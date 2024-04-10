@@ -10,26 +10,31 @@
 </div>
 <section class="section catalog">
     <div class="row">
-        <!-- Left side columns -->
         <div class="col-lg-12">
             <div class="card">
-                
                 <div class="card-body">
+                    <div id="success_msg">@if(Session::has('success'))
+                        <p class="alert alert-info">{{ Session::get('success') }}</p>
+                        @endif
+                      </div>
+
                     <button class="btn btn-default my-3" onClick="openCatalogModal()" href="javascript:void(0)">Add Catalog</button>
                   <a href="{{url('download_csv')}}"><button class="btn btn-default my-3"  href="javascript:void(0)">Download CSV Format</button></a>
+                  <button id="export_csv" class="btn btn-default my-3" onClick="" href="javascript:void(0)">Export CSV</button>
+                  <!-- <div  id="export_csv">
                   <a href="{{url('export')}}"><button class="btn btn-default my-3" onClick="" href="javascript:void(0)">Export CSV</button></a>
-                  <form action="{{ url('importCSV') }}" method="POST" enctype="multipart/form-data">
-                @csrf
-                <div class="messages">
-                </div>
-                <div class="fields">
-                    <div class="input-group mb-3">
-                        <input type="file" class="form-control" id="import_csv" name="import_csv" accept=".csv">
-                        <!-- <label class="input-group-text" for="import_csv">Upload</label> -->
-                    </div>
-                </div>
-                <button type="submit" class="btn btn-success">Import CSV</button>
-            </form>
+                   </div> -->
+                   <input id="status" type  ="hidden">
+
+                <form action="{{ url('importCSV') }}" method="POST" enctype="multipart/form-data" >
+                        @csrf
+                        <div class="import_div my-3">
+                            <div class="input-group mb-3">
+                                <input type="file" class="form-control" id="import_csv" name="import_csv" accept=".csv" required>
+                            </div>
+                        </div>
+                        <button  type="submit" class="btn btn-success">Import CSV</button>
+                </form>
                   
                     <!-- <h5 class="card-title">Table with stripped rows</h5> -->
                     <form id="filter-data" method="GET" action="{{ route('catalogs.index') }}">
@@ -311,28 +316,35 @@
                 },
                 { name: 'Title', 
                     render: function (data, type, row) {
-                      return row.title ?? 'NA';    
+                      return row.title ?? 'N/A';    
                     }
                 },
                 { name: 'Base Price', 
                     render: function (data, type, row) {
-                      return '$'+row.base_price ?? 'NA';    
+                      return '$'+row.base_price ?? 'N/A';    
                     }
                 },{ name: 'SKU', 
                     render: function (data, type, row) {
-                      return row.sku ?? 'NA';    
+                      return row.sku ?? 'N/A';    
                     }
                 },{ name: 'Publish Date', 
                     render: function (data, type, row) {
-                      return row.publish_date ?? 'NA';    
+                      return row.publish_date ?? 'N/A';    
                     }
                 },
                 {
                     name: 'Image',
                     render: function(data, type, row) {
-                        var image = "NA";
+                        var image = "N/A";
                         if (row.image) {
-                            image = '<img src="{{ asset('storage') }}/' + row.image + '" height="40" width="70" alt="Catalog Image">';
+                            console.log(row.image);
+                            if(row.image  == "")
+                            {
+                                image = "N/A";
+                            }else{
+                                image = '<img src="{{ asset('storage') }}/' + row.image + '" height="40" width="70" alt="Catalog Image">';
+                            }
+                           
                         }
                         return image;
                     }
@@ -627,9 +639,27 @@
 
         // Set selected attribute for the option with the selected value
         $(this).find("option[value='" + selectedValue + "']").attr("selected", "selected");
-
         catalogsTable.ajax.url("{{ route('catalogs.index') }}?status_filter=" + selectedValue).load();
+        $('#status').val(selectedValue);
+
+       
+
+  
     });
 
 </script>
+
+<script>
+$(document).on("click", '#export_csv', function(){
+    var status = $('#status').val();
+    window.location.href = "{{ URL::to('export') }}?status_filter=" + status;
+});
+</script>
+
+<script>
+ setTimeout(function() {
+    $('#success_msg').fadeOut('fast');
+}, 5000);
+    </script>
+
 @endsection
