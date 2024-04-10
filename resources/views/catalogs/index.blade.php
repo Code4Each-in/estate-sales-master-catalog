@@ -2,6 +2,7 @@
 @section('title', 'Catalogs')
 @section('sub-title', 'Catalogs')
 @section('content')
+
 <div id="loader">
    
     <div class="spinner-border text-warning loader-spinner"  role="status">
@@ -13,6 +14,8 @@
         <div class="col-lg-12">
             <div class="card">
                 <div class="card-body">
+                    <div class="export_outer_cont">
+                    <div  class="export_btn_cont">
                     <div id="success_msg">@if(Session::has('success'))
                         <p class="alert alert-info">{{ Session::get('success') }}</p>
                         @endif
@@ -21,19 +24,23 @@
                     <button class="btn btn-default my-3" onClick="openCatalogModal()" href="javascript:void(0)">Add Catalog</button>
                   <a href="{{url('download_csv')}}"><button class="btn btn-default my-3"  href="javascript:void(0)">Download CSV Format</button></a>
                   <button id="export_csv" class="btn btn-default my-3" onClick="" href="javascript:void(0)">Export CSV</button>
-                
+</div>
+<div  class="import_btn_cont">
                    <input id="status" type  ="hidden">
 
                 <form action="{{ url('importCSV') }}" method="POST" enctype="multipart/form-data" >
                         @csrf
+                        <div class="choose-form">
                         <div class="import_div my-3">
                             <div class="input-group mb-3">
                                 <input type="file" class="form-control" id="import_csv" name="import_csv" accept=".csv" required>
                             </div>
                         </div>
                         <button  type="submit" class="btn btn-success">Import CSV</button>
+                  </div>
                 </form>
-                  
+</div>
+</div>
                     <!-- <h5 class="card-title">Table with stripped rows</h5> -->
                     <form id="filter-data" method="GET" action="{{ route('catalogs.index') }}">
                         <div class="row mt-3 mx-auto">
