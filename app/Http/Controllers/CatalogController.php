@@ -322,9 +322,9 @@ class CatalogController extends Controller
                 return null; // Return null or handle error response as needed
             }
         } catch (Exception $e) {
-            // Handle exceptions (e.g., log error)
+            
             Log::error('Exception occurred: ' . $e->getMessage());
-            return null; // Return null or handle exception as needed
+            return null; 
         }
     }
 
@@ -345,7 +345,7 @@ class CatalogController extends Controller
         ];
   
         return response()->stream(function () use ($statusFilter5) {
-       // return response()->stream(function () {
+       
             $handle = fopen('php://output', 'w');
     
           //  Add CSV headers
@@ -367,37 +367,32 @@ class CatalogController extends Controller
                         if ((!empty($statusFilter5)) && $statusFilter5 !== "all") {
                             $query->where('status', '=', $statusFilter5);
                         }
-                        $employees = $query->get();
-                  
-                    
-
-             // DB::table('catalogs')->where('status', '=', $statusFilter5)->chunk(25, function ($employees) use ($handle) {
-           //Catalog::where('status', '=', $statusFilter5)->chunk(25, function ($employees) use ($handle) {
+                        $catalogs = $query->get();
        
-            // Catalog::chunk(25, function ($employees) use ($handle) {
-                foreach ($employees as $employee) {
+          
+                foreach ($catalogs as $val) {
                     $author = DB::table('users')
-                     ->where('id', $employee->author_id)
+                     ->where('id', $val->author_id)
                      ->get();
                   
-               $image_url =  url('/storage')."/".$employee->image;
+               $image_url =  url('/storage')."/".$val->image;
            //  Extract data from each employee.
                     $data = [
-                        isset($employee->id)? $employee->id : '',
+                        isset($val->id)? $val->id : '',
                         isset($author[0]->first_name)? $author[0]->first_name : '',
-                        isset($employee->title)? $employee->title : '',
-                        isset($employee->base_price)? $employee->base_price : '',
-                        isset($employee->sku)? $employee->sku : '',
-                        isset($employee->publish_date)? $employee->publish_date : '',
+                        isset($val->title)? $val->title : '',
+                        isset($val->base_price)? $val->base_price : '',
+                        isset($val->sku)? $val->sku : '',
+                        isset($val->publish_date)? $val->publish_date : '',
                         isset($image_url)? $image_url : '',
-                        isset($employee->status)? $employee->status : ''
+                        isset($val->status)? $val->status : ''
                       
                     ];
     
            //  Write data to a CSV file.
                    fputcsv($handle, $data);
                }
-          // });
+        
     
            // Close CSV file handle
            fclose($handle);
@@ -456,7 +451,7 @@ class CatalogController extends Controller
 
     public function importCSV(Request $request)
     {
-      // dd($request);
+      
       $auth =   $request->validate([
             'import_csv' => 'required',
         ]);
@@ -528,7 +523,7 @@ class CatalogController extends Controller
                 
                 // Set options
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // Disabling SSL verification (not recommended in production)
+                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); 
                 
                 // Fetching image content from URL
                 $imageContent = curl_exec($ch);

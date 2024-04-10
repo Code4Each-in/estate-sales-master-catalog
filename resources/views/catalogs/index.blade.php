@@ -21,9 +21,7 @@
                     <button class="btn btn-default my-3" onClick="openCatalogModal()" href="javascript:void(0)">Add Catalog</button>
                   <a href="{{url('download_csv')}}"><button class="btn btn-default my-3"  href="javascript:void(0)">Download CSV Format</button></a>
                   <button id="export_csv" class="btn btn-default my-3" onClick="" href="javascript:void(0)">Export CSV</button>
-                  <!-- <div  id="export_csv">
-                  <a href="{{url('export')}}"><button class="btn btn-default my-3" onClick="" href="javascript:void(0)">Export CSV</button></a>
-                   </div> -->
+                
                    <input id="status" type  ="hidden">
 
                 <form action="{{ url('importCSV') }}" method="POST" enctype="multipart/form-data" >
@@ -337,7 +335,6 @@
                     render: function(data, type, row) {
                         var image = "N/A";
                         if (row.image) {
-                            console.log(row.image);
                             if(row.image  == "")
                             {
                                 image = "N/A";
@@ -660,6 +657,6 @@ $(document).on("click", '#export_csv', function(){
  setTimeout(function() {
     $('#success_msg').fadeOut('fast');
 }, 5000);
-    </script>
+</script>
 
 @endsection
