@@ -374,18 +374,25 @@ class CatalogController extends Controller
                     $author = DB::table('users')
                      ->where('id', $val->author_id)
                      ->get();
+
+                     if(empty($val->image))
+                     {
+                        $image_url = 'N/A';
+                     }else{
+                        $image_url =  url('/storage')."/".$val->image;
+                     }
                   
-               $image_url =  url('/storage')."/".$val->image;
+               
            //  Extract data from each employee.
                     $data = [
-                        isset($val->id)? $val->id : '',
-                        isset($author[0]->first_name)? $author[0]->first_name : '',
-                        isset($val->title)? $val->title : '',
-                        isset($val->base_price)? $val->base_price : '',
-                        isset($val->sku)? $val->sku : '',
-                        isset($val->publish_date)? $val->publish_date : '',
-                        isset($image_url)? $image_url : '',
-                        isset($val->status)? $val->status : ''
+                        isset($val->id)? $val->id : 'N/A',
+                        isset($author[0]->first_name)? $author[0]->first_name : 'N/A',
+                        isset($val->title)? $val->title : 'N/A',
+                        isset($val->base_price)? $val->base_price : 'N/A',
+                        isset($val->sku)? $val->sku : 'N/A',
+                        isset($val->publish_date)? $val->publish_date : 'N/A',
+                        isset($image_url)? $image_url : 'N/A',
+                        isset($val->status)? $val->status : 'N/A'
                       
                     ];
     
