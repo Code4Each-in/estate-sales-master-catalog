@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use GuzzleHttp\Client;
 
 class CatalogController extends Controller
 {
@@ -20,6 +21,7 @@ class CatalogController extends Controller
      */
     public function index()
     {    
+
         if (request()->ajax()) {
             $query = Catalog::query();
     
@@ -517,17 +519,10 @@ class CatalogController extends Controller
                 $employee->status = $status;
                 $employee->save();
             } else{
-            
-
-              
-                
                 // Extracting filename from URL
                 $filename = uniqid() . '_' . basename($image);
-                
-                
                 // Initialize cURL session
                 $ch = curl_init($image);
-                
                 // Set options
                 curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
                 curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); 
@@ -562,9 +557,11 @@ class CatalogController extends Controller
                     throw new \Exception('Failed to save image file');
                 }
                 // Returning the file path if successful, otherwise null
-                 
+             
+
 
                 $employee = new Catalog();
+                $employee->author_id = auth()->user()->id;
                 $employee->title = $title;
                 $employee->base_price = $base_price;
                 $employee->sku = $sku;
@@ -578,4 +575,23 @@ class CatalogController extends Controller
 //-------------------------------------------------------------------------------------------
         }
     }   
+
+    public function  catalog_api()
+    {
+        $client = new Client(); 
+        $response = $client->request('GET', 'https://staging.recollection.com/wp-json/custom/v3/user-count-by-catalog', ['verify' => false]);
+        
+        if ($response->getStatusCode() === 200) {
+            $data = json_decode($response->getBody());
+            $result =  $data->data;
+            foreach ($result as $val) {
+              print_r($val);
+            }
+        } else {
+            // Handle error
+            return null;
+        }
+        
+    }
+
 }
