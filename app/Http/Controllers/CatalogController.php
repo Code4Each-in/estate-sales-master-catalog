@@ -181,9 +181,9 @@ class CatalogController extends Controller
         ];
         try {
             $results =  $this->getProducts($id);
-          //  dd($results);
+          
            
-            if($results['success'] == true && $results['status'] == 200 && $results['status'] == 400   ){
+            if($results['success'] == true && $results['status'] == 200 && $results['data'] != null ){
                $products = $results['data'];
             }else{
                 $products = [];
@@ -630,39 +630,41 @@ class CatalogController extends Controller
         }
     }   
 
-    public function  catalog_api()
-    {
+    // public function  catalog_api()
+    // {
     
-         $client = new Client(); 
-        $response = $client->request('GET', 'https://staging.recollection.com/wp-json/custom/v3/users-by-catalog-id/5', ['verify' => false]);
+    //      $client = new Client(); 
+    //     $response = $client->request('GET', 'https://staging.recollection.com/wp-json/custom/v3/users-by-catalog-id/5', ['verify' => false]);
         
-        if ($response->getStatusCode() === 200) {
-            $data = json_decode($response->getBody());
-            $result =  $data->data;
-            foreach ($result as $val) {
-                echo "<pre>";
-              print_r($val);
-            }
-        }
-         else {
-            return null;
-        }
+    //     if ($response->getStatusCode() === 200) {
+    //         $data = json_decode($response->getBody());
+    //         $result =  $data->data;
+    //         foreach ($result as $val) {
+    //             echo "<pre>";
+    //           print_r($val);
+    //         }
+    //     }
+    //      else {
+    //         return null;
+    //     }
         
-    }
+    // }
 
     public function get_user_data(Request $request)
     {
         $id = $request->input('id');
-       //print_r($id);
         $client = new Client(); 
         $response = $client->request('GET', 'https://staging.recollection.com/wp-json/custom/v3/users-by-catalog-id/'.$id, ['verify' => false]);
         
         if ($response->getStatusCode() === 200) {
             $data = json_decode($response->getBody());
             $result =  $data->data;
-            foreach ($result as $val) {
-             echo json_encode($val);
-            }
+             if(!empty($result)){
+                foreach ($result as $val) {
+                    echo json_encode($val);
+                   }
+             }
+          
         }
          else {
             return null;
