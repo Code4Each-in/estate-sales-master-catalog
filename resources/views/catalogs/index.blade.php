@@ -76,12 +76,13 @@
                                         <th scope="col">Base Price</th>
                                         <th scope="col">SKU</th>
                                         <th scope="col">Publish Date</th>
+                                        <th scope="col">User Count</th>
                                         <th scope="col">Image</th>
                                         <th scope="col">Status</th>
                                         <th scope="col">Action</th>
                                     </tr>
                                 </thead>
-                                <!-- <tbody>
+                                <!-- <tbody >
                                   
                                 </tbody> -->
                             </table>
@@ -268,6 +269,40 @@
             <!--end: Edit User Modal -->
 
 
+                         <!--start:  users count Modal -->
+                         <div class="modal fade" id="user_count" aria-labelledby="role" aria-hidden="true">
+                         <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="role">User Count</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                <!-- Table with stripped rows -->
+                    <div class="box-header with-border" id="filter-box">
+                        <div class="box-body table-responsive" style="margin-bottom: 5%">
+                            <table class="datatable table table-striped my-2" id="catalogs_table">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Id</th>
+                                        <th scope="col">Name</th>
+                                        <th scope="col">E-MAIL</th>
+                                   
+                                    </tr>
+                                </thead>
+                                <tbody id="append_user">
+                                  
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <!-- End Table with stripped rows -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--end:  User  count Modal -->
+
+
             <!--start: Delete Modal -->
             <div class="modal fade" id="deleteCatalog" tabindex="-1" aria-labelledby="role" aria-hidden="true">
                 <div class="modal-dialog modal-lg">
@@ -301,12 +336,6 @@
 <script>
      var catalogsTable;
     $(document).ready(function() {
-     
-        // $('#catalogs_table').DataTable({
-        //     "order": []
-
-        // });
-
         catalogsTable = $('#catalogs_table').DataTable({
             processing: true,
             serverSide: true,
@@ -335,6 +364,18 @@
                 },{ name: 'Publish Date', 
                     render: function (data, type, row) {
                       return row.publish_date ?? 'N/A';    
+                    }
+                },
+                { name: 'User Count', 
+                    render: function (data, type, row) {
+                     
+                        if(row.user_count !== undefined && row.user_count !== null) {
+                       return '<a class="btn-fa-catalog" onclick="user_count(' + row.id + ')" href="javascript:void(0)">' + row.user_count + '</a>';
+                    }
+                    if (row.user_count == undefined){
+                        return 'N/A';
+                    }
+
                     }
                 },
                 {
@@ -665,5 +706,29 @@ $(document).on("click", '#export_csv', function(){
     $('#success_msg').fadeOut('fast');
 }, 5000);
 </script>
+
+<script>
+    function user_count(id) {
+        $('#loader').show(); 
+        var csrfToken = $('meta[name="csrf-token"]').attr('content');
+         vdata =  {id:id};
+         $.ajax({
+            type: "post",
+            url: "{{ url('get_user_data') }}" + '/' + id,
+            headers: {'X-CSRF-Token': csrfToken},
+            data: vdata,
+            dataType: 'json',
+            success: function(data)  {
+                $('#loader').hide(); 
+                $('#user_count').modal('show');
+                $("#append_user").empty();
+                $.each(data, function(key, val) {
+                    var output = "<td>" + val + "</td>";
+                    $('#append_user').append(output);
+                    });
+             }
+         });
+    }
+    </script>
 
 @endsection

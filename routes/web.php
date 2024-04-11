@@ -60,12 +60,16 @@ Route::group(['middleware' => ['auth']], function() {
         
         // Export csv file
          Route::get('/export', [CatalogController::class,'exportCSV'])->name('export.index');
-       
+       // Route::get('/export/{id}', portCSV']);
         //Import csv file
         Route::post('importCSV', [CatalogController::class, 'importCSV']);
         // Download  CSV Format
         Route::get('/download_csv', [CatalogController::class,'download_csv']);
 
     Route::get('logout', [AuthController::class, 'logOut'])->name('logout');
+    // User count api
+    Route::post('get_user_data/{id}', [CatalogController::class, 'get_user_data']);
 });
 //Authenticated Group Routes Ends
+
+
