@@ -72,40 +72,41 @@ class CatalogController extends Controller
                     $db_id[]  = ($data1['id']);
                     $i++;
                 }
+                $catalog_ids = '[' . implode(',', $db_id) . ']';
  //--------------------------------------------------------------------------
+
+ //  Api to Count user_count 
                 $client = new Client(); 
-                $response = $client->request('GET', 'https://staging.recollection.com/wp-json/custom/v3/user-count-by-catalog', ['verify' => false]);
-                
+                $response = $client->request('GET', 'https://staging.recollection.com/wp-json/custom/v3/user-product-counts-by-catalog?catalog_ids='.$catalog_ids, ['verify' => false]);
                 if ($response->getStatusCode() === 200) {
                     $data5 = json_decode($response->getBody());
                     $result =  $data5->data;
-                  
-                    foreach ($result as $val) {
-                    
+
+                   foreach($result as $val)
+                   {
                      if(in_array($val->catalog_id,  $db_id)){
-                     
-                     
-                       $record = $data->where('id', $val->catalog_id)->first();
-                     //  $record->user_count = $val->user_count;
+                      $record = $data->where('id', $val->catalog_id)->first();
+                      $record->user_count = $val->user_count;
                          if ($record) {
-                                // If the record exists, update its user_count property
                                 $record->user_count = $val->user_count;
-                            } else {
-                                // If the record doesn't exist, create a new object with the ID and user_count
+                            }else
+                            {
                                 $record = (object) [
                                     'id' => $val->catalog_id,
                                     'user_count' => $val->user_count
                                 ];
-                                // Add the new record to the $data collection
                                 $data->push($record);
                             }
-
-                     }
-                    
-                    }
-                 
+                   }
+                }
                 }
 //-----------------------------------------------------------------------------
+
+
+
+//-----------------------------------------------------------------------------
+
+
     
             return response()->json([
                 'data' => $data,
@@ -630,47 +631,107 @@ class CatalogController extends Controller
         }
     }   
 
-    // public function  catalog_api()
-    // {
-    
-    //      $client = new Client(); 
-    //     $response = $client->request('GET', 'https://staging.recollection.com/wp-json/custom/v3/users-by-catalog-id/5', ['verify' => false]);
-        
-    //     if ($response->getStatusCode() === 200) {
-    //         $data = json_decode($response->getBody());
-    //         $result =  $data->data;
-    //         foreach ($result as $val) {
-    //             echo "<pre>";
-    //           print_r($val);
-    //         }
-    //     }
-    //      else {
-    //         return null;
-    //     }
-        
-    // }
+
+
 
     public function get_user_data(Request $request)
-    {
-        $id = $request->input('id');
-        $client = new Client(); 
-        $response = $client->request('GET', 'https://staging.recollection.com/wp-json/custom/v3/users-by-catalog-id/'.$id, ['verify' => false]);
+   {
+    $id = $request->input('id');
+    $title = $request->input('title');
+    $client = new Client(); 
+    $response = $client->request('GET', 'https://staging.recollection.com/wp-json/custom/v3/users-by-catalog-id/'.$id, ['verify' => false]);
+    
+    if ($response->getStatusCode() === 200) {
+        $data = json_decode($response->getBody());
+        $result = $data->data;
+        $responseArray = array(); // Initialize an array to hold response data
         
-        if ($response->getStatusCode() === 200) {
-            $data = json_decode($response->getBody());
-            $result =  $data->data;
-             if(!empty($result)){
-                foreach ($result as $val) {
-                    echo json_encode($val);
-                   }
-             }
-          
+        if(!empty($result)){
+            foreach ($result as $val) {
+                $userWithTile = array(
+                    'title' => $title,
+                    'user_data' => $val
+                );
+                $responseArray[] = $userWithTile; // Add each user data with title to response array
+            }
+            echo json_encode($responseArray); 
         }
-         else {
-            return null;
-        }
+    } else {
+        return null;
     }
+  }
 
+
+public function total_catalogs()
+{
+    
+    $id = 8;
+    $apiUrl = rtrim(env('WORDPRESS_URL'), '/') . '/wp-json/custom/v3/products-by-meta';
+
+    try {
+        $response = Http::withoutVerifying()
+            ->get($apiUrl, ['cat_id' => $id]);
+           
+        
+        // Check if the request was successful
+        if ($response->successful()) {
+            $data = $response->json(); 
+            $data = $data['data'];
+              $total_cat  = count($data);
+              print_r($total_cat);
+
+           $i = 0;
+          // print_r(count($data));
+            foreach($data as $row) 
+            {
+               echo "<pre>";
+              
+            
+                $cata_id  =  $row['meta_data'][0]['value'][0];
+                print_r($cata_id);
+           
+            //    $i++;
+            }
+            
+           // return $data; // Return the data
+          //  echo  "<pre>";
+           // print_r(count($data['data']));
+           
+            
+        } else {
+            // Handle unsuccessful response (e.g., log error)
+            Log::error('Failed to fetch data from WordPress API');
+            return null; // Return null or handle error response as needed
+        }
+    } catch (Exception $e) {
+        
+        Log::error('Exception occurred: ' . $e->getMessage());
+        return null; 
+    }
+}
+
+
+//Testing api
+
+// public function testing_api()
+// {
+ 
+//  $client = new Client(); 
+//  $response = $client->request('GET', 'https://staging.recollection.com/wp-json/custom/v3/user-product-counts-by-catalog?catalog_ids=[1,5,8,9]', ['verify' => false]);
+ 
+//  if ($response->getStatusCode() === 200) {
+//      $data = json_decode($response->getBody());
+//      $result = $data->data;
+//      $responseArray = array(); // Initialize an array to hold response data
+     
+//      if(!empty($result)){
+//         dd($result);
+     
+//      }
+//  } else {
+//      return null;
+//  }
+// }
    
 
 }

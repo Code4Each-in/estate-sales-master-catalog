@@ -3,8 +3,8 @@
 @section('sub-title', 'Catalogs')
 @section('content')
 
+
 <div id="loader">
-   
     <div class="spinner-border text-warning loader-spinner"  role="status">
                 <span class="visually-hidden">Loading...</span>
     </div>
@@ -22,8 +22,8 @@
                       </div>
 
                     <button class="btn btn-default my-3" onClick="openCatalogModal()" href="javascript:void(0)">Add Catalog</button>
-                  <a href="{{url('download_csv')}}"><button class="btn btn-default my-3"  href="javascript:void(0)">Download CSV Format</button></a>
-                  <button id="export_csv" class="btn btn-default my-3" onClick="" href="javascript:void(0)">Export CSV</button>
+                  <a href="{{url('download_csv')}}"><button class="btn btn-secondary my-3"  href="javascript:void(0)">Download CSV Format</button></a>
+                  <button id="export_csv" class="btn btn-secondary my-3" onClick="" href="javascript:void(0)">Export CSV</button>
 </div>
 <div  class="import_btn_cont">
                    <input id="status" type  ="hidden">
@@ -77,9 +77,11 @@
                                         <th scope="col">SKU</th>
                                         <th scope="col">Publish Date</th>
                                         <th scope="col">User Count</th>
+                                        <th scope="col">Total  Catalogs</th>
                                         <th scope="col">Image</th>
                                         <th scope="col">Status</th>
                                         <th scope="col">Action</th>
+                                        
                                     </tr>
                                 </thead>
                                 <!-- <tbody >
@@ -274,13 +276,16 @@
                          <div class="modal-dialog modal-lg">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h5 class="modal-title" id="role">User Count</h5>
+                                <h5 class="modal-title" id="role">User Count</h5><br>
+                            
+                             
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                 <!-- Table with stripped rows -->
                     <div class="box-header with-border" id="filter-box">
+                    <h5 id="append_title"></h5>
                         <div class="box-body table-responsive" style="margin-bottom: 5%">
-                            <table class="datatable table table-striped my-2" id="catalogs_table">
+                            <table class="datatable table table-striped my-2" id="myDataTable">
                                 <thead>
                                     <tr>
                                         <th scope="col">Id</th>
@@ -290,6 +295,7 @@
                                     </tr>
                                 </thead>
                                 <tbody id="append_user">
+                                    
                                   
                                 </tbody>
                             </table>
@@ -370,12 +376,20 @@
                     render: function (data, type, row) {
                      
                         if(row.user_count !== undefined && row.user_count !== null) {
-                       return '<a class="btn-fa-catalog" onclick="user_count(' + row.id + ')" href="javascript:void(0)">' + row.user_count + '</a>';
+                    //    return '<a class="btn-fa-catalog" onclick="user_count(' + row.id + ')" href="javascript:void(0)">' + row.user_count + '</a>';
+                    return '<a class="btn-fa-catalog" onclick="user_count(' + row.id + ',\'' + row.title + '\')" href="javascript:void(0)">' + row.user_count + '</a>';
+
+
                     }
                     if (row.user_count == undefined){
                         return 'N/A';
                     }
 
+                    }
+                },
+                { name: 'Total  Catalogs', 
+                    render: function (data, type, row) {
+                      return row.total_catalog ?? 'N/A';    
                     }
                 },
                 {
@@ -708,27 +722,41 @@ $(document).on("click", '#export_csv', function(){
 </script>
 
 <script>
-    function user_count(id) {
+    function user_count(id,title) {
+       // console.log(id)
         $('#loader').show(); 
         var csrfToken = $('meta[name="csrf-token"]').attr('content');
-         vdata =  {id:id};
+            var tboby = $('#append_user');
+            tboby.empty();
+         vdata =  {id:id, title: title};
          $.ajax({
-            type: "post",
-            url: "{{ url('get_user_data') }}" + '/' + id,
-            headers: {'X-CSRF-Token': csrfToken},
-            data: vdata,
-            dataType: 'json',
-            success: function(data)  {
-                $('#loader').hide(); 
-                $('#user_count').modal('show');
-                $("#append_user").empty();
-                $.each(data, function(key, val) {
-                    var output = "<td>" + val + "</td>";
-                    $('#append_user').append(output);
-                    });
-             }
-         });
+    type: "post",
+    url: "{{ url('get_user_data') }}" + '/' + id,
+    headers: {'X-CSRF-Token': csrfToken},
+    data: vdata,
+    dataType: 'json',
+    success: function(data)  {
+        $('#loader').hide(); 
+        $('#user_count').modal('show');
+        $("#append_user").empty();
+        var tbody = $("#append_user"); // Select the table body
+        $.each(data, function(key, val) {
+            var tr = $('<tr></tr>'); // Create a new table row for each user
+            tr.append('<td>' + val.user_data.user_id + '</td>');
+            tr.append('<td>' + val.user_data.user_name + '</td>');
+            tr.append('<td>' + val.user_data.user_email + '</td>');
+            tbody.append(tr); // Append the new table row to the table body
+            $('#append_title').html(val.title);
+        });
+        table = $('#myDataTable').DataTable(); // Initialize DataTable
+    }
+});
+
     }
     </script>
+
+
+
+
 
 @endsection
