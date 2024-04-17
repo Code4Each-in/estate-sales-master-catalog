@@ -75,9 +75,11 @@ class CatalogController extends Controller
                 $catalog_ids = '[' . implode(',', $db_id) . ']';
  //--------------------------------------------------------------------------
 
- //  Api to Count user_count 
+           //  Api to Count user_count 
                 $client = new Client(); 
-                $response = $client->request('GET', 'https://staging.recollection.com/wp-json/custom/v3/user-product-counts-by-catalog?catalog_ids='.$catalog_ids, ['verify' => false]);
+                $apiUrl = rtrim(env('WORDPRESS_URL'), '/') . '/wp-json/custom/v3/user-product-counts-by-catalog?catalog_ids='.$catalog_ids;
+                  $response = $client->request('GET', $apiUrl, ['verify' => false]);
+             
                 if ($response->getStatusCode() === 200) {
                     $data5 = json_decode($response->getBody());
                     $result =  $data5->data;
@@ -136,7 +138,6 @@ class CatalogController extends Controller
     {
           //Request Data validation
           $validatedData = $request->validated();
-          
 
            //Create User
          $catalog = Catalog::create([
@@ -151,9 +152,18 @@ class CatalogController extends Controller
             'publish_date' => $validatedData['status'] == 'publish' ? now() : null,
             'created_at' => now(),
             'updated_at' => now(),
+            'weight' => $validatedData['weight'],
+            'color' => $validatedData['color'],
+            'sale_price' => $validatedData['sale_price'],
+            'brand' => $validatedData['Brand'],
+            'length' => $validatedData['length'],
+            'width' => $validatedData['width'],
+            'height'=> $validatedData['height'],
         ]);
 
-        //Only if Needs to update the preview image then this will update the image
+      
+
+      //  Only if Needs to update the preview image then this will update the image
         if ($request->hasFile('image')) {
             //Delete The Old Stored Image in path And Upload New
                 $uploadedFile = $request->file('image');
@@ -222,7 +232,8 @@ class CatalogController extends Controller
     {
           //Request Data validation
           $validatedData = $request->validated();
-           //Update User
+         
+          // Update User
            $catalogs = Catalog::where('id', $catalog->id)->update([
             // 'name' => $validatedData['title'],
             'title' => $validatedData['title'],
@@ -233,6 +244,14 @@ class CatalogController extends Controller
             'status' => $validatedData['status'],
             'publish_date' => $validatedData['status'] == 'publish' ? now() : null,
             'updated_at' => now(),
+            'weight' => $validatedData['weight'],
+            'color' => $validatedData['color'],
+            'sale_price' => $validatedData['sale_price'],
+            'brand' => $validatedData['editBrand'],
+            'length' => $validatedData['length'],
+            'width' => $validatedData['width'],
+            'height'=> $validatedData['height'],
+           
         ]);
 
          //Only if Needs to update the preview image then this will update the image
@@ -251,7 +270,7 @@ class CatalogController extends Controller
 
         }
 
-        $request->session()->flash('message','Catalog updated successfully.');
+       $request->session()->flash('message','Catalog updated successfully.');
 		return Response()->json(['status'=>200]);
     }
 
@@ -639,8 +658,8 @@ class CatalogController extends Controller
     $id = $request->input('id');
     $title = $request->input('title');
     $client = new Client(); 
-    $response = $client->request('GET', 'https://staging.recollection.com/wp-json/custom/v3/users-by-catalog-id/'.$id, ['verify' => false]);
-    
+    $apiUrl = rtrim(env('WORDPRESS_URL'), '/') . '/wp-json/custom/v3/users-by-catalog-id/'.$id;
+    $response = $client->request('GET', $apiUrl, ['verify' => false]);
     if ($response->getStatusCode() === 200) {
         $data = json_decode($response->getBody());
         $result = $data->data;
@@ -660,55 +679,6 @@ class CatalogController extends Controller
         return null;
     }
   }
-
-
-public function total_catalogs()
-{
-    
-    $id = 8;
-    $apiUrl = rtrim(env('WORDPRESS_URL'), '/') . '/wp-json/custom/v3/products-by-meta';
-
-    try {
-        $response = Http::withoutVerifying()
-            ->get($apiUrl, ['cat_id' => $id]);
-           
-        
-        // Check if the request was successful
-        if ($response->successful()) {
-            $data = $response->json(); 
-            $data = $data['data'];
-              $total_cat  = count($data);
-              print_r($total_cat);
-
-           $i = 0;
-          // print_r(count($data));
-            foreach($data as $row) 
-            {
-               echo "<pre>";
-              
-            
-                $cata_id  =  $row['meta_data'][0]['value'][0];
-                print_r($cata_id);
-           
-            //    $i++;
-            }
-            
-           // return $data; // Return the data
-          //  echo  "<pre>";
-           // print_r(count($data['data']));
-           
-            
-        } else {
-            // Handle unsuccessful response (e.g., log error)
-            Log::error('Failed to fetch data from WordPress API');
-            return null; // Return null or handle error response as needed
-        }
-    } catch (Exception $e) {
-        
-        Log::error('Exception occurred: ' . $e->getMessage());
-        return null; 
-    }
-}
 
 
 //Testing api

@@ -24,7 +24,7 @@ Route::match(['get', 'post'], '/login', [AuthController::class, 'login'])->name(
 Route::get('/forgot-password', [AuthController::class, 'forgotPasswordView'])->name('forgot-password');
 Route::post('/forgot-password', [AuthController::class, 'forgotPassword'])->name('forgot.password');
 Route::get('/reset/password/{token}', [AuthController::class, 'resetPassword']);
-Route::post('/reset/password', [AuthController::class, 'submitResetPasswordForm'])->name('submit.reset.password');
+Route::post('/reset/password', [AuthController::class, 'submitResetPasswordForm'])->name('submit.reset.password');   
 
 //Authenticated Group Routes Starts
 Route::group(['middleware' => ['auth']], function() {
@@ -60,7 +60,7 @@ Route::group(['middleware' => ['auth']], function() {
         
         // Export csv file
          Route::get('/export', [CatalogController::class,'exportCSV'])->name('export.index');
-       // Route::get('/export/{id}', portCSV']);
+     
         //Import csv file
         Route::post('importCSV', [CatalogController::class, 'importCSV']);
         // Download  CSV Format
@@ -71,5 +71,8 @@ Route::group(['middleware' => ['auth']], function() {
     Route::post('get_user_data/{id}', [CatalogController::class, 'get_user_data']);
 });
 //Authenticated Group Routes Ends
+
+
+
 
 
