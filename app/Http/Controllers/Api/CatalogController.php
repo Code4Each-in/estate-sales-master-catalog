@@ -7,6 +7,8 @@ use App\Models\Catalog;
 use App\Models\PendingCatalog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use App\Http\Requests\AddCatalogAPI;
+
 
 class CatalogController extends Controller
 {
@@ -103,5 +105,90 @@ class CatalogController extends Controller
         ];
         return response()->json($response); 
     }
+
+     public  function savecatalog(AddCatalogAPI $request)
+        {
+          
+            $response = [
+                'success' => false,
+                'status' => 400,
+                'message' => 'An error occurred while attempting to save pending catalog.'
+            ];
+    
+            $validatedData = $request->validated();
+         
+  
+    
+            //-------------------------------------------------------
+            if($validatedData['image'])
+            {
+                // Extracting filename from URL
+                $filename = uniqid() . '_' . basename($validatedData['image']);
+                // Initialize cURL session
+                $ch = curl_init($validatedData['image']);
+                // Set options
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); 
+                
+                // Fetching image content from URL
+                $imageContent = curl_exec($ch);
+                
+                // Checking if image content was retrieved successfully
+                if ($imageContent === false) {
+                    throw new \Exception('Failed to retrieve image content from URL');
+                }
+                
+                // Close cURL session
+                curl_close($ch);
+                
+              $saveDirectory = storage_path('/app/public/Catalogs');
+             
+          
+                if (!is_dir($saveDirectory)) {
+                    mkdir($saveDirectory, 0755, true); // Creating directory if it doesn't exist
+                }
+                
+              //  Full file path to save the image
+               $filePath = $saveDirectory . '/' . $filename;
+                
+               // Saving image content to file
+               $saved = file_put_contents($filePath, $imageContent);
+               
+                
+               // Checking if image file was saved successfully
+                if ($saved === false) {
+                    throw new \Exception('Failed to save image file');
+                }
+              
+              $Catalog = Catalog::create([
+                'author_id' => $validatedData['author_id'],
+                'wp_category_id' => $validatedData['wp_category_id'],
+                'title' => $validatedData['title'],
+                'name' => $validatedData['name'],
+                'sku' => $validatedData['sku'],
+                'base_price' => $validatedData['base_price'],
+                'image' => "Catalogs/".$filename,
+                'content' => $validatedData['content'],
+                'status' => $validatedData['status'],
+                'publish_date' => $validatedData['publish_date']
+            ]);
+   
+        // return $saved ? $filePath : null; 
+            //-----
+            } 
+            //--------------------------------------------------------
+            if($Catalog){
+                $response = [
+                    'success' => true,
+                    'status' => 201,
+                    'message' => 'Catalog Added',
+                    'data' => ['catalog_id' =>  $Catalog->id ],
+                ];
+            }                
+
+            return response()->json($response);
+           
+        }
+
     
 }

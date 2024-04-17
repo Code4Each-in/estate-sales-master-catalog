@@ -3,8 +3,8 @@
 @section('sub-title', 'Catalogs')
 @section('content')
 
+
 <div id="loader">
-   
     <div class="spinner-border text-warning loader-spinner"  role="status">
                 <span class="visually-hidden">Loading...</span>
     </div>
@@ -22,8 +22,8 @@
                       </div>
 
                     <button class="btn btn-default my-3" onClick="openCatalogModal()" href="javascript:void(0)">Add Catalog</button>
-                  <a href="{{url('download_csv')}}"><button class="btn btn-default my-3"  href="javascript:void(0)">Download CSV Format</button></a>
-                  <button id="export_csv" class="btn btn-default my-3" onClick="" href="javascript:void(0)">Export CSV</button>
+                  <a href="{{url('download_csv')}}"><button class="btn btn-secondary my-3"  href="javascript:void(0)">Download CSV Format</button></a>
+                  <button id="export_csv" class="btn btn-secondary my-3" onClick="" href="javascript:void(0)">Export CSV</button>
 </div>
 <div  class="import_btn_cont">
                    <input id="status" type  ="hidden">
@@ -76,12 +76,15 @@
                                         <th scope="col">Base Price</th>
                                         <th scope="col">SKU</th>
                                         <th scope="col">Publish Date</th>
+                                        <th scope="col">User Count</th>
+                                        <!-- <th scope="col">Total  Catalogs</th> -->
                                         <th scope="col">Image</th>
                                         <th scope="col">Status</th>
                                         <th scope="col">Action</th>
+                                        
                                     </tr>
                                 </thead>
-                                <!-- <tbody>
+                                <!-- <tbody >
                                   
                                 </tbody> -->
                             </table>
@@ -110,7 +113,7 @@
                                         </div>
                                         <div class="row mb-3">
 
-                                            <label for="content" class="col-sm-3 col-form-label required">Content</label>
+                                            <label for="content" class="col-sm-3 col-form-label required">Description</label>
                                             <div class="col-sm-9">
                                                 <textarea class="form-control" name="content" style="height: 100px" id="content"></textarea>
                                             </div>
@@ -162,6 +165,46 @@
                                                     <option value="draft">Draft</option>
                                                     <option value="publish">Publish</option>
                                                 </select>
+                                            </div>
+                                        </div>
+                                        <div class="row mb-3 mt-4">
+                                            <label for="weight" class="col-sm-3 col-form-label ">Weight (lbs)</label>
+                                            <div class="col-sm-9">
+                                                <input type="number" class="form-control" name="weight" id="weight" >
+                                            </div>
+                                        </div>
+                                        <div class="row mb-3 mt-4">
+                                            <label for="color" class="col-sm-3 col-form-label ">Color</label>
+                                            <div class="col-sm-9">
+                                                <input type="text" class="form-control" name="color" id="color" >
+                                            </div>
+                                        </div>
+                                        <div class="row mb-3 mt-4">
+                                            <label for="sale_price" class="col-sm-3 col-form-label ">Sale Price </label>
+                                            <div class="col-sm-9">
+                                                <input type="number" class="form-control" name="sale_price" id="sale_price" >
+                                            </div>
+                                        </div>
+                                        <div class="row mb-3">
+                                            <label for="Brand" class="col-sm-3 col-form-label ">Brand</label>
+                                            <div class="col-sm-9">
+                                                <select name="Brand" class="form-select" id="Brand">
+                                                     <option value="0">Select the Brand</option>
+                                                    <option value="Puma">Puma</option>
+                                                    <option value="Addidas">Addidas</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="row mb-3 mt-4">
+                                            <label for="dimensions" class="col-sm-3 col-form-label ">Dimensions (in)</label>
+                                            <div class="col-sm-3">
+                                                <input type="number" class="form-control" name="length" id="length" placeholder="Length">
+                                            </div>
+                                            <div class="col-sm-3">
+                                                <input type="number" class="form-control" name="width" id="width" placeholder="Width">
+                                            </div>
+                                            <div class="col-sm-3">
+                                                <input type="number" class="form-control" name="height" id="height" placeholder="Height">
                                             </div>
                                         </div>
                                     </div>
@@ -235,7 +278,10 @@
                                         <label for="edit_image" class="col-sm-3 col-form-label">Image</label>
                                         <div class="col-sm-9">
                                             <input type="file" class="form-control" name="image" id="edit_image">
+                                            <div id="image_tag">
                                             <img src="" height="80" width="40" alt="Catalog Image" id="edit_image5" class="mt-3">
+                                            </div>
+                                            
                                         </div>
                                        
                                     </div>
@@ -254,6 +300,46 @@
                                             </select>
                                         </div>
                                     </div>
+                                    <div class="row mb-3 mt-4">
+                                            <label for="weight" class="col-sm-3 col-form-label ">Weight (lbs)</label>
+                                            <div class="col-sm-9">
+                                                <input type="number" class="form-control" name="weight" id="edit_weight" >
+                                            </div>
+                                        </div>
+                                        <div class="row mb-3 mt-4">
+                                            <label for="color" class="col-sm-3 col-form-label ">Color</label>
+                                            <div class="col-sm-9">
+                                                <input type="text" class="form-control" name="color" id="edit_color" >
+                                            </div>
+                                        </div>  
+                                        <div class="row mb-3 mt-4">
+                                            <label for="sale_price" class="col-sm-3 col-form-label ">Sale Price </label>
+                                            <div class="col-sm-9">
+                                                <input type="number" class="form-control" name="sale_price" id="edit_sale_price" >
+                                            </div>
+                                        </div>
+                                        <div class="row mb-3">
+                                            <label for="Brand" class="col-sm-3 col-form-label ">Brand</label>
+                                            <div class="col-sm-9">
+                                                <select name="editBrand" class="form-select" id="edit_Brand">
+                                                <option value="0">Select the Brand</option>
+                                                    <option value="Puma">Puma</option>
+                                                    <option value="Addidas">Addidas</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="row mb-3 mt-4">
+                                            <label for="dimensions" class="col-sm-3 col-form-label ">Dimensions (in)</label>
+                                            <div class="col-sm-3">
+                                                <input type="number" class="form-control" name="length" id="edit_length" placeholder="Length">
+                                            </div>
+                                            <div class="col-sm-3">
+                                                <input type="number" class="form-control" name="width" id="edit_width" placeholder="Width">
+                                            </div>
+                                            <div class="col-sm-3">
+                                                <input type="number" class="form-control" name="height" id="edit_height" placeholder="Height">
+                                            </div>
+                                        </div>
                                     <input type="hidden" class="form-control" name="users_id" id="catalog_id" value="">
                                 </div>
                                 <div class="modal-footer">
@@ -266,6 +352,44 @@
                 </div>
             </div>
             <!--end: Edit User Modal -->
+
+
+                         <!--start:  users count Modal -->
+                         <div class="modal fade" id="user_count" aria-labelledby="role" aria-hidden="true">
+                         <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="role">User Count</h5><br>
+                            
+                             
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                <!-- Table with stripped rows -->
+                    <div class="box-header with-border" id="filter-box">
+                    <h5 id="append_title"></h5>
+                        <div class="box-body table-responsive" style="margin-bottom: 5%">
+                            <table class="datatable table table-striped my-2" id="myDataTable">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Id</th>
+                                        <th scope="col">Name</th>
+                                        <th scope="col">E-MAIL</th>
+                                   
+                                    </tr>
+                                </thead>
+                                <tbody id="append_user">
+                                    
+                                  
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <!-- End Table with stripped rows -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!--end:  User  count Modal -->
 
 
             <!--start: Delete Modal -->
@@ -301,12 +425,6 @@
 <script>
      var catalogsTable;
     $(document).ready(function() {
-     
-        // $('#catalogs_table').DataTable({
-        //     "order": []
-
-        // });
-
         catalogsTable = $('#catalogs_table').DataTable({
             processing: true,
             serverSide: true,
@@ -337,6 +455,26 @@
                       return row.publish_date ?? 'N/A';    
                     }
                 },
+                { name: 'User Count', 
+                    render: function (data, type, row) {
+                     
+                        if(row.user_count !== undefined && row.user_count !== null) {
+                    //    return '<a class="btn-fa-catalog" onclick="user_count(' + row.id + ')" href="javascript:void(0)">' + row.user_count + '</a>';
+                    return '<a class="btn-fa-catalog" onclick="user_count(' + row.id + ',\'' + row.title + '\')" href="javascript:void(0)">' + row.user_count + '</a>';
+
+
+                    }
+                    if (row.user_count == undefined){
+                        return 'N/A';
+                    }
+
+                    }
+                },
+                // { name: 'Total  Catalogs', 
+                //     render: function (data, type, row) {
+                //       return row.total_catalog ?? 'N/A';    
+                //     }
+                // },
                 {
                     name: 'Image',
                     render: function(data, type, row) {
@@ -490,7 +628,7 @@
             url: "{{ url('/catalogs/edit') }}" + '/' + id,
             dataType: 'json',
             success: (res) => {
-               
+              
                 if (res.catalogs != null) {
                     $('#editCatalogs').modal('show');
                     $('#edit_name').val(res.catalogs.name);
@@ -498,12 +636,32 @@
                     $('#edit_content').val(res.catalogs.content);
                     $('#edit_sku').val(res.catalogs.sku);
                     $('#edit_base_price').val(res.catalogs.base_price);
-                    $('#edit_status option[value="' + res.catalogs.status + '"]').attr('selected',
-                        'selected');
+                    $('#edit_status option[value="' + res.catalogs.status + '"]').attr('selected','selected');
                     $('#edit_category').val(res.catalogs.wp_category_id).trigger('change');
+                    if(res.catalogs.image  == ''){
+                      $('#image_tag').hide();
+                    }else{
+                       
+                        var url =   {!! json_encode(url('/storage/')) !!} + '/'+ res.catalogs.image;
+                         $('#edit_image5').attr({src: url});
+                         $('#image_tag').show();
+                    }
+                  
+
+                    $('#edit_weight').val(res.catalogs.weight);
+                    $('#edit_color').val(res.catalogs.color);
+                    $('#edit_sale_price').val(res.catalogs.sale_price);
+                    $('#edit_Brand').val(res.catalogs.brand);
+                    $('#edit_length').val(res.catalogs.length);
+                    $('#edit_width').val(res.catalogs.width);
+                    $('#edit_height').val(res.catalogs.height);
+                    if(res.catalogs.brand ==  null){
+
+                        $('#edit_Brand option[value="0"]').attr('selected','selected');
+                    }else{
+                        $('#edit_Brand option[value="' + res.catalogs.brand + '"]').attr('selected','selected');
+                    }
                     
-                    var url =   {!! json_encode(url('/storage/')) !!} + '/'+ res.catalogs.image;
-                    $('#edit_image5').attr({src: url});
                     // $("#edit_category").select2('val',res.catalogs.wp_category_id);
                     // $('#edit_category').select2().val(225).trigger('change');
                 }
@@ -665,5 +823,43 @@ $(document).on("click", '#export_csv', function(){
     $('#success_msg').fadeOut('fast');
 }, 5000);
 </script>
+
+<script>
+    function user_count(id,title) {
+       // console.log(id)
+        $('#loader').show(); 
+        var csrfToken = $('meta[name="csrf-token"]').attr('content');
+            var tboby = $('#append_user');
+            tboby.empty();
+         vdata =  {id:id, title: title};
+         $.ajax({
+    type: "post",
+    url: "{{ url('get_user_data') }}" + '/' + id,
+    headers: {'X-CSRF-Token': csrfToken},
+    data: vdata,
+    dataType: 'json',
+    success: function(data)  {
+        $('#loader').hide(); 
+        $('#user_count').modal('show');
+        $("#append_user").empty();
+        var tbody = $("#append_user"); // Select the table body
+        $.each(data, function(key, val) {
+            var tr = $('<tr></tr>'); // Create a new table row for each user
+            tr.append('<td>' + val.user_data.user_id + '</td>');
+            tr.append('<td>' + val.user_data.user_name + '</td>');
+            tr.append('<td>' + val.user_data.user_email + '</td>');
+            tbody.append(tr); // Append the new table row to the table body
+            $('#append_title').html(val.title);
+        });
+        table = $('#myDataTable').DataTable(); // Initialize DataTable
+    }
+});
+
+    }
+    </script>
+
+
+
+
 
 @endsection

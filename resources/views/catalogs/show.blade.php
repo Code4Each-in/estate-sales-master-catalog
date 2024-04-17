@@ -68,7 +68,7 @@
                 </div>
             </div>
             <div class="card-title">
-                <h4>Product Sales History</h4>
+                <h4>Products</h4>
             </div>
             <div class="card">
 

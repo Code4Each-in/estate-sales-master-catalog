@@ -17,7 +17,7 @@
 								</a>
 							</div><!-- End Logo -->
 
-							<div class="card mb-3">
+							<div class="card mb-3"> 
 
 								<div class="card-body">
 
@@ -48,6 +48,9 @@
 											<div class="input-group has-validation">
 												<span class="input-group-text" id="inputGroupPrepend">@</span>
 												<input type="text" name="email" class="form-control" id="email" required>
+												@if ($errors->has('email'))
+												<span class="text-danger my-2">{{ $errors->first('email') }}</span>
+												@endif
 												<div class="invalid-feedback">Please enter your Email.</div>
 											</div>
 										</div>

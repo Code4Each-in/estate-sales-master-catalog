@@ -76,10 +76,13 @@ class AuthController extends Controller
 
     public function forgotPassword(Request $request)
     {
+      
         $request->validate([
-            'email' => 'required|email|exists:users',
+            'email' => 'required|email',
         ]);
+      
         $recipient = User::where('email', $request->email)->first();
+       
         if($recipient){
             $token = Str::random(64);
             // Update or insert a record into the password_reset_tokens table
@@ -109,7 +112,7 @@ class AuthController extends Controller
             return redirect()->back()->with('error', 'Your Email Is Not Registered.');
         }
 
-        return redirect()->back()->with('message', 'We have mailed your password reset link!');
+       return redirect()->back()->with('message', 'We have mailed your password reset link!');
     }
 
     public function resetPassword($token)
