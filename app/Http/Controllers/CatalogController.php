@@ -74,11 +74,14 @@ class CatalogController extends Controller
                 }
                 $catalog_ids = '[' . implode(',', $db_id) . ']';
  //--------------------------------------------------------------------------
-
+                    if(env('stagging_url')== "active"){
+                //   echo "false";
+                    
            //  Api to Count user_count 
-                $client = new Client(); 
+                 $client = new Client(); 
                 $apiUrl = rtrim(env('WORDPRESS_URL'), '/') . '/wp-json/custom/v3/user-product-counts-by-catalog?catalog_ids='.$catalog_ids;
                   $response = $client->request('GET', $apiUrl, ['verify' => false]);
+             
              
                 if ($response->getStatusCode() === 200) {
                     $data5 = json_decode($response->getBody());
@@ -102,9 +105,12 @@ class CatalogController extends Controller
                    }
                 }
                 }
-//-----------------------------------------------------------------------------
+                    }
 
 
+                  
+//--------------------------------------------------------------------------
+              
 
 //-----------------------------------------------------------------------------
 
@@ -118,8 +124,16 @@ class CatalogController extends Controller
             ]);
            
         }
-    
+        if(env('stagging_url')== "unactive"){
+            //  echo "true";
+              session()->flash('static_url', 'Api Not working.  So user count is static on this  page ');
+              return view('catalogs.index');
+          }
+       else{
         return view('catalogs.index');
+       }
+          
+
     }
     
 
@@ -203,13 +217,34 @@ class CatalogController extends Controller
             //throw $th;
             $products = [];
         }
-        //    $results =  $this->getProducts($id);
-           
-        // if($results['success'] == true && $results['status'] == 200 ){
-        //    $products = $results['data'];
-        // }else{
-        //     $products = [];
+
+        ///--------------------------------------------------------
+      //  $client = new Client(); 
+      //  $apiUrl = rtrim(env('WORDPRESS_URL'), '/') . '/wp-json/custom/v3/orders_by_master_catalog?master_catalog_id='.$id;
+        //$response = $client->request('GET', $apiUrl, ['verify' => false]);
+    
+        // if ($response->getStatusCode() === 200) {
+        //     $apiData = json_decode($response->getBody(), true); 
+    
+        //     if ($apiData !== null && isset($apiData['data'])) {
+        //         $apiResult = $apiData['data'];
+        //         $apiResponseArray = array(); 
+                
+        //         foreach ($apiResult as $val) {
+        //             $apiResponseArray[] = $val; 
+        //         }
+    
+        //         // Merge the API data with existing data
+        //         $data['api'] = $apiResponseArray;
+        //        $result =  $data['api'];
+        //     }else{
+        //         $result = [];
+        //     }
+        // } else {
+        //     $result = [];
         // }
+        //---------------------------------------------------------
+     
         
         return view('catalogs.show',compact('catalog','data','products'));
     }
@@ -681,27 +716,61 @@ class CatalogController extends Controller
   }
 
 
+
+
+public function show_pro_his(Request $req)
+{   
+   // dd($req->all());
+    $id = $req->cata_id;
+    $client = new Client(); 
+    $apiUrl = rtrim(env('WORDPRESS_URL'), '/') . '/wp-json/custom/v3/orders_by_master_catalog?master_catalog_id='.$id;
+    $response = $client->request('GET', $apiUrl, ['verify' => false]);
+
+    if ($response->getStatusCode() === 200) {
+        $data = json_decode($response->getBody(), true); 
+
+        if ($data !== null && isset($data['data'])) {
+            $result = $data['data'];
+            $responseArray = array(); 
+            
+            foreach ($result as $val) {
+                $responseArray[] = $val; 
+            }
+            
+            return $responseArray; 
+        } else {
+            return null;
+        }
+    } else {
+        return null;
+    }
+}
+
 //Testing api
 
-// public function testing_api()
-// {
- 
-//  $client = new Client(); 
-//  $response = $client->request('GET', 'https://staging.recollection.com/wp-json/custom/v3/user-product-counts-by-catalog?catalog_ids=[1,5,8,9]', ['verify' => false]);
- 
-//  if ($response->getStatusCode() === 200) {
-//      $data = json_decode($response->getBody());
-//      $result = $data->data;
-//      $responseArray = array(); // Initialize an array to hold response data
-     
-//      if(!empty($result)){
-//         dd($result);
-     
-//      }
-//  } else {
-//      return null;
-//  }
-// }
+
+
+public function testing_api()
+{
+    try {
+        $client = new Client(); 
+        $response = $client->request('GET', 'https://staging.recollection.com/wp-json/custom/v3/user-product-counts-by-catalog?catalog_ids=[5,8,9,11]', ['verify' => false]);
+        
+        if ($response->getStatusCode() === 200) {
+            // $data5 = json_decode($response->getBody());
+            // $result =  $data5->data;
+       
+        }
+    } catch (RequestException $e) {
+        if ($e->hasResponse()) {
+            $statusCode = $e->getResponse()->getStatusCode();
+        } else {
+       
+        }
+    }
+}
+
+
    
 
 }
