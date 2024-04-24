@@ -251,7 +251,10 @@
                                 <h5 class="card-title">Reports</h5>
                                 <div>
                                    <p class="alert alert-info" style="color: red;">This graph originates from statistical data and will be made dynamic later.</p>
+                                
+                                  
                                 </div>
+                             
                                 <!-- Line Chart -->
                                <div id="reportsChart"></div>
                             
@@ -347,6 +350,52 @@
     }
   
    
+    document.addEventListener("DOMContentLoaded", () => {
+        new ApexCharts(document.querySelector("#reportsChart"), {
+          
+      
+               series: [
+                {
+                    name: ["2023", "2024"],
+                   // data: salePricesByYear.map(item =>  item.price)
+                   data : [700, 550, 600, 800, 200, 153, 190, 700]
+                    
+                }
+
+    ],
+          chart: {
+          height: 350,
+          type: 'line',
+          zoom: {
+            enabled: false
+          }
+        },
+        dataLabels: {
+          enabled: false
+        },
+        stroke: {
+          curve: 'straight'
+        },
+        title: {
+          text: 'Product Trends by Month',
+          align: 'left'
+        },
+        grid: {
+          row: {
+            colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
+            opacity: 0.5
+          },
+        },
+        xaxis: {
+         // categories: dates,
+         categories: ["Feb 01","Feb 02", "Mar 10", "April 15", "May 25", "June 30", "July 06", "Sep 11"]
+        }
+        
+        }).render();
+    });
+
+
+
 </script>
 
 
@@ -382,6 +431,10 @@ function historyGalary(galleryData) {
 </script>
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 
+
+@if (env('stagging_url')!='unactive')
+                                    
+                                
 <script>
   $(document).ready(function(){
     var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
@@ -401,6 +454,9 @@ function historyGalary(galleryData) {
          var dates = [];
          var salePricesByYear =  [];
          
+       
+        
+      
            $.each(data, function(key, val) {
         var orderDateParts = val.order_created_at.split(' ')[0].split('-');
         var year = orderDateParts[0];
@@ -436,52 +492,48 @@ function historyGalary(galleryData) {
                        $('#sale_history').append(result); 
         });
       
-          var options = {
-               series: [
-                {
-                    name: "2023 " ,
-                   // data: salePricesByYear.map(item =>  item.price)
-                   data : [700, 550, 600, 800, 200, 153, 190, 700]
+    //       var options = {
+    //            series: [
+    //             {
+    //                 name: "2023 " ,
+    //                // data: salePricesByYear.map(item =>  item.price)
+    //                data : [700, 550, 600, 800, 200, 153, 190, 700]
                     
-                }
+    //             }
 
-    ],
-          chart: {
-          height: 350,
-          type: 'line',
-          zoom: {
-            enabled: false
-          }
-        },
-        dataLabels: {
-          enabled: false
-        },
-        stroke: {
-          curve: 'straight'
-        },
-        title: {
-          text: 'Product Trends by Month',
-          align: 'left'
-        },
-        grid: {
-          row: {
-            colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
-            opacity: 0.5
-          },
-        },
-        xaxis: {
-         // categories: dates,
-         categories: ["Feb 01","Feb 02", "Mar 10", "April 15", "May 25", "June 30", "July 06", "Sep 11"]
-        }
-        };
+    // ],
+    //       chart: {
+    //       height: 350,
+    //       type: 'line',
+    //       zoom: {
+    //         enabled: false
+    //       }
+    //     },
+    //     dataLabels: {
+    //       enabled: false
+    //     },
+    //     stroke: {
+    //       curve: 'straight'
+    //     },
+    //     title: {
+    //       text: 'Product Trends by Month',
+    //       align: 'left'
+    //     },
+    //     grid: {
+    //       row: {
+    //         colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
+    //         opacity: 0.5
+    //       },
+    //     },
+    //     xaxis: {
+    //      // categories: dates,
+    //      categories: ["Feb 01","Feb 02", "Mar 10", "April 15", "May 25", "June 30", "July 06", "Sep 11"]
+    //     }
+    //     };
                 // Populate series data from AJAX response
 
-
-        
-
-
-            const chart = new ApexCharts(document.querySelector("#reportsChart"), options);
-           chart.render();
+        //     const chart = new ApexCharts(document.querySelector("#reportsChart"), options);
+        //    chart.render();
              if ($.fn.DataTable.isDataTable('#sale_history_table')) {
                     $('#sale_history_table').DataTable().destroy();
                 }
@@ -491,7 +543,7 @@ function historyGalary(galleryData) {
     });
   });
 </script>
-
+@endif
 
    
 @endsection
