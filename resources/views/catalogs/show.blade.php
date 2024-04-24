@@ -2,6 +2,11 @@
 @section('title', 'Catalog')
 @section('sub-title', 'Show Catalog')
 @section('content')
+<div id="loader">
+    <div class="spinner-border text-warning loader-spinner"  role="status">
+                <span class="visually-hidden">Loading...</span>
+    </div>
+</div>
 <section class="section catalog">
     <div class="row">
         <!-- Left side columns -->
@@ -26,7 +31,7 @@
                     <div class="row mb-1 mt-4">
                         <label for="" class="col-sm-3">Content:</label>
                         <div class="col-sm-9">
-                            {{$catalog->content ?? 'NA' }}
+                        {{ str_replace('&nbsp;', '', strip_tags($catalog->content)) ?? 'NA' }}
                         </div>
                     </div>
 
@@ -56,6 +61,51 @@
                         </div>
                     </div>
                     <div class="row mb-1 mt-4">
+                        <label for="" class="col-sm-3">Weigth:</label>
+                        <div class="col-sm-9">
+                            {{$catalog->weight ?? 'NA' }}
+                        </div>
+                    </div>
+                    <div class="row mb-1 mt-4">
+                        <label for="" class="col-sm-3">Color:</label>
+                        <div class="col-sm-9">
+                            {{$catalog->color ?? 'NA' }}
+                        </div>
+                    </div>
+                    <div class="row mb-1 mt-4">
+                        <label for="" class="col-sm-3">Sale Price:</label>
+                        <div class="col-sm-9">
+                            {{$catalog->sale_price ?? 'NA' }}
+                        </div>
+                    </div>
+                    <div class="row mb-1 mt-4">
+                        <label for="" class="col-sm-3">Brand:</label>
+                        <div class="col-sm-9">
+                            {{$catalog->brand ?? 'NA' }}
+                        </div>
+                    </div>
+                    <div class="row mb-1 mt-4">
+                        <label for="" class="col-sm-3">Length:</label>
+                        <div class="col-sm-9">
+                            {{$catalog->length ?? 'NA' }}
+                        </div>
+                    </div>
+
+                    <div class="row mb-1 mt-4">
+                        <label for="" class="col-sm-3">Width:</label>
+                        <div class="col-sm-9">
+                            {{$catalog->width ?? 'NA' }}
+                        </div>
+                    </div>
+
+                    <div class="row mb-1 mt-4">
+                        <label for="" class="col-sm-3">Height:</label>
+                        <div class="col-sm-9">
+                            {{$catalog->height ?? 'NA' }}
+                        </div>
+                    </div>
+
+                    <div class="row mb-1 mt-4">
                         <label for="" class="col-sm-3">Image:</label>
                         <div class="col-sm-9">
                             @if ($catalog->image == null)
@@ -65,13 +115,13 @@
                             @endif
                         </div>
                     </div>
+
                 </div>
             </div>
             <div class="card-title">
                 <h4>Products</h4>
             </div>
             <div class="card">
-
                 <div class="card-body">
                     <!-- Table with stripped rows -->
                     <div class="box-header with-border my-4" id="filter-box">
@@ -95,7 +145,7 @@
                                 </thead>
                                 <tbody>
 
-                                    @foreach($products as $index => $product)
+                                    @foreach($products as $index => $product) 
                                     <tr>
                                         <th scope="row">{{ $product['id'] }}</th>
 
@@ -130,11 +180,7 @@
                                         </td>
                                         <td>
                                         
-                                            <a href="javascript:void(0)" onClick="openGalleryModal('{{ isset($product['gallery_images']) ? addslashes(json_encode($product['gallery_images'])) : '' }}')" class="btn btn-default-border">Gallery</a>
-
-
-
-
+                                            <a href="javascript:void(0)" onClick="openGalleryModal('{{ isset($product['gallery_images']) ? (json_encode($product['gallery_images'])) : '' }}')" class="btn btn-default-border">Gallery</a>
                                         </td>
                                     </tr>
                                     @endforeach
@@ -145,9 +191,51 @@
                         </div>
                     </div>
                     <!-- End Table with stripped rows -->
-
                 </div>
             </div>
+
+            <!-- // Product sale history -->
+            <div class="card-title">
+                <h4>Products Sale History</h4>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <!-- Table with stripped rows -->
+                    <div class="box-header with-border my-4" id="filter-box">
+                        <div class="box-body table-responsive" style="margin-bottom: 5%">
+                            <table class="datatable table table-striped my-2" id="sale_history_table">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Id</th>
+                                        <!-- <th scope="col">Name</th> -->
+                                        <th scope="col">Name</th>
+                                        <th scope="col">Sku</th>
+                                        <th scope="col">Price</th>
+                                        <th scope="col">Regular Price</th>
+                                        <th scope="col">Sale Price</th>
+                                        <th scope="col">Publish Date</th>
+                                        <th scope="col">Stock</th>
+                                        <th scope="col">Image</th>
+                                        <th scope="col">Status</th>
+                                        <th scope="col">Action</th>
+                                    </tr>
+                                </thead>
+                                 <tbody   id="sale_history">
+
+                                 </tbody>
+
+                            </table>
+                        </div>
+                    </div>
+                    <!-- End Table with stripped rows -->
+                </div>
+            </div>
+             <!-- // End Product sale history -->
+
+
+
+
+
 
             <!-- <div class="card-title">
                 <h4>Reports</h4>
@@ -161,8 +249,12 @@
 
                             <div class="card-body">
                                 <h5 class="card-title">Reports</h5>
+                                <div>
+                                   <p class="alert alert-info" style="color: red;">This graph originates from statistical data and will be made dynamic later.</p>
+                                </div>
                                 <!-- Line Chart -->
-                                <div id="reportsChart"></div>
+                               <div id="reportsChart"></div>
+                            
                                 <!-- End Line Chart -->
                             </div>
                         </div>
@@ -207,10 +299,7 @@
     });
 
     function openGalleryModal(galleryData) {
-        // console.log(galleryData);
-         // Convert the JSON string to an array
-         var images = JSON.parse(galleryData);
-        
+        var images = JSON.parse(galleryData);
         // Get the gallery container
         var galleryContainer = document.getElementById("galleryContainer");
 
@@ -250,61 +339,159 @@
             setTimeout(function() {
                 galleryContainer.removeChild(loadingText);
             }, 2000);
-            
+
         }
         // $('.alert-danger').html('');
         // $('#first_name').val('');
         $('#showGallery').modal('show');
     }
-
-    document.addEventListener("DOMContentLoaded", () => {
-        const data = @json($data);
-        // console.log(data);
-        new ApexCharts(document.querySelector("#reportsChart"), {
-            series: [{
-                name: 'Revenue',
-                data: [11, 32, 45, 32, 34, 52, 41]
-            }, {
-                name: 'Customers',
-                data: [15, 11, 32, 18, 9, 24, 11]
-            }],
-            chart: {
-                height: 350,
-                type: 'area',
-                toolbar: {
-                    show: false
-                },
-            },
-            markers: {
-                size: 4
-            },
-            colors: ['#4154f1', '#2eca6a', '#ff771d'],
-            fill: {
-                type: "gradient",
-                gradient: {
-                    shadeIntensity: 1,
-                    opacityFrom: 0.3,
-                    opacityTo: 0.4,
-                    stops: [0, 90, 100]
-                }
-            },
-            dataLabels: {
-                enabled: false
-            },
-            stroke: {
-                curve: 'smooth',
-                width: 2
-            },
-            xaxis: {
-                type: 'datetime',
-                categories: ["2018-09-19T00:00:00.000Z", "2018-09-19T01:30:00.000Z", "2018-09-19T02:30:00.000Z", "2018-09-19T03:30:00.000Z", "2018-09-19T04:30:00.000Z", "2018-09-19T05:30:00.000Z", "2018-09-19T06:30:00.000Z"]
-            },
-            tooltip: {
-                x: {
-                    format: 'dd/MM/yy HH:mm'
-                },
-            }
-        }).render();
-    });
+  
+   
 </script>
+
+
+<script>
+function historyGalary(galleryData) {
+    var images = galleryData.split(','); // Split the string into an array of image URLs
+    var galleryContainer = document.getElementById("galleryContainer");
+    galleryContainer.innerHTML = ""; // Clear previous content
+
+    if (images === null || images.length === 0) {
+        var noImageText = document.createElement("p");
+        noImageText.textContent = "No Image";
+        galleryContainer.appendChild(noImageText);
+    } else {
+        var loadingText = document.createElement("p");
+        loadingText.textContent = "Loading...";
+        galleryContainer.appendChild(loadingText);
+
+        images.forEach(function(imageUrl) { // Loop through each image URL
+            var img = document.createElement("img");
+            img.src = imageUrl.trim(); // Trim any whitespace around the URL
+            img.alt = "Gallery Image";
+            img.style.maxWidth = "100px";
+            galleryContainer.appendChild(img);
+        });
+
+        setTimeout(function() {
+            galleryContainer.removeChild(loadingText);
+        }, 2000);
+    }
+       $('#showGallery').modal('show');
+}
+</script>
+<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
+<script>
+  $(document).ready(function(){
+    var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    var url = $(location).attr('href').split("/").splice(0, 5).join("/");
+    var segments = url.split( '/' );
+    var cata_id = segments[4];
+    $('#loader').show(); 
+    var vdata = {cata_id : cata_id, "_token": "{{ csrf_token() }}"};
+    $.ajax({
+      url: "{{url('show_pro_his')}}",
+      type: "post",
+      data: vdata,
+      success: function(data){
+        $('#loader').hide(); 
+        var salePricesArray = [];
+       // var years = [];
+         var dates = [];
+         var salePricesByYear =  [];
+         
+           $.each(data, function(key, val) {
+        var orderDateParts = val.order_created_at.split(' ')[0].split('-');
+        var year = orderDateParts[0];
+        var month = orderDateParts[1];
+        var date = val.order_created_at.split(' ')[0];
+
+        salePricesByYear.push({year55: year, price: val.last_selling_price});
+        dates.push(months[parseInt(month) - 1] + ' ' + month);
+            
+            var statusBadge;
+            if(val.status=="publish"){
+              statusBadge = '<span class="badge rounded-pill bg-success">' + val.status + '</span>';
+            } else {
+              statusBadge = '<span class="badge rounded-pill bg-warning">' + val.status + '</span>';
+            }
+            var skuValue = val.sku == '' ? "NA" : val.sku;
+            stock = val.stock == null ? "NA" : val.stock;
+
+
+          var result = '<tr>' +
+                         '<td>'+ val.id+ '</td>' +
+                         '<td>'+ val.name+ '</td>' +
+                         '<td>'+ skuValue + '</td>' +
+                         '<td>'+ val.price+ '</td>' +
+                         '<td>'+ val.regular_price+ '</td>' +
+                         '<td>'+ val.sale_price+ '</td>' +
+                         '<td>'+ val.publish_date+ '</td>' +
+                         '<td>'+ stock + '</td>' +
+                         '<td>'+ '<img src="' + val.images.thumbnail + '" alt="img" width="40" height="70">' + '</td>' +
+                         '<td>'+ statusBadge + '</td>' +
+                         '<td><a href="javascript:void(0)" onClick="historyGalary(\'' + val.gallery_images + '\')" class="btn btn-default-border">Gallery</a></td>' +
+                       '</tr>';
+                       $('#sale_history').append(result); 
+        });
+      
+          var options = {
+               series: [
+                {
+                    name: "2023 " ,
+                   // data: salePricesByYear.map(item =>  item.price)
+                   data : [700, 550, 600, 800, 200, 153, 190, 700]
+                    
+                }
+
+    ],
+          chart: {
+          height: 350,
+          type: 'line',
+          zoom: {
+            enabled: false
+          }
+        },
+        dataLabels: {
+          enabled: false
+        },
+        stroke: {
+          curve: 'straight'
+        },
+        title: {
+          text: 'Product Trends by Month',
+          align: 'left'
+        },
+        grid: {
+          row: {
+            colors: ['#f3f3f3', 'transparent'], // takes an array which will be repeated on columns
+            opacity: 0.5
+          },
+        },
+        xaxis: {
+         // categories: dates,
+         categories: ["Feb 01","Feb 02", "Mar 10", "April 15", "May 25", "June 30", "July 06", "Sep 11"]
+        }
+        };
+                // Populate series data from AJAX response
+
+
+        
+
+
+            const chart = new ApexCharts(document.querySelector("#reportsChart"), options);
+           chart.render();
+             if ($.fn.DataTable.isDataTable('#sale_history_table')) {
+                    $('#sale_history_table').DataTable().destroy();
+                }
+                
+                $('#sale_history_table').dataTable();
+      }
+    });
+  });
+</script>
+
+
+   
 @endsection
