@@ -770,6 +770,11 @@ public function testing_api()
     }
 }
 
+public function catalogs_sync()
+{
+    return view('catalogs-sync.index');
+}
+
 
    
 

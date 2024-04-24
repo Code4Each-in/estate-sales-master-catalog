@@ -30,7 +30,7 @@ Route::post('/reset/password', [AuthController::class, 'submitResetPasswordForm'
 Route::group(['middleware' => ['auth']], function() {
 
     Route::get('/dashboard',[DashboardController::class,'index'])->name('dashboard');
-       
+        
         //Protected Routes For Admin
            Route::group(['middleware' => ['admin']], function() {
             //Users Routes
@@ -72,7 +72,10 @@ Route::group(['middleware' => ['auth']], function() {
 });
 //Authenticated Group Routes Ends
 
+Route::post('show_pro_his', [CatalogController::class, 'show_pro_his']);
 
+Route::get('testing_api', [CatalogController::class, 'testing_api']);
+Route::get('catalogs-sync', [CatalogController::class, 'catalogs_sync']);
 
 
 
