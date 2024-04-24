@@ -9,6 +9,10 @@
                 <span class="visually-hidden">Loading...</span>
     </div>
 </div>
+<div id="url_msg">@if(Session::has('static_url'))
+<p class="alert alert-info">{{ Session::get('static_url') }}</p>
+ @endif
+ </div>
 <section class="section catalog">
     <div class="row">
         <div class="col-lg-12">
@@ -16,6 +20,10 @@
                 <div class="card-body">
                     <div class="export_outer_cont">
                     <div  class="export_btn_cont">
+                    <div >@if(Session::has('message'))
+                        <p class="alert alert-info">{{ Session::get('message') }}</p>
+                        @endif
+                      </div>
                     <div id="success_msg">@if(Session::has('success'))
                         <p class="alert alert-info">{{ Session::get('success') }}</p>
                         @endif
@@ -116,6 +124,7 @@
                                             <label for="content" class="col-sm-3 col-form-label required">Description</label>
                                             <div class="col-sm-9">
                                                 <textarea class="form-control" name="content" style="height: 100px" id="content"></textarea>
+                                                <!-- <textarea id="myTextarea" name="content"></textarea> -->
                                             </div>
                                         </div>
                                         <!-- <div class="row mb-3 mt-4">
@@ -241,7 +250,7 @@
                                     </div>
                                     <div class="row mb-3">
 
-                                        <label for="edit_content" class="col-sm-3 col-form-label required">Content</label>
+                                        <label for="edit_content" class="col-sm-3 col-form-label required">Description</label>
                                         <div class="col-sm-9">
                                             <textarea class="form-control" name="content" style="height: 100px" id="edit_content"></textarea>
                                         </div>
@@ -457,16 +466,15 @@
                 },
                 { name: 'User Count', 
                     render: function (data, type, row) {
-                     
-                        if(row.user_count !== undefined && row.user_count !== null) {
-                    //    return '<a class="btn-fa-catalog" onclick="user_count(' + row.id + ')" href="javascript:void(0)">' + row.user_count + '</a>';
-                    return '<a class="btn-fa-catalog" onclick="user_count(' + row.id + ',\'' + row.title + '\')" href="javascript:void(0)">' + row.user_count + '</a>';
-
-
-                    }
-                    if (row.user_count == undefined){
+                        // console.log(row);
                         return 'N/A';
-                    }
+                // if(row.user_count !== undefined && row.user_count !== null) {
+              
+                //     return '<a class="btn-fa-catalog" onclick="user_count(' + row.id + ',\'' + row.title + '\')" href="javascript:void(0)">' + row.user_count + '</a>';
+                //     }
+                //     if (row.user_count == undefined){
+                //         return 'N/A';
+                //     }
 
                     }
                 },
@@ -555,6 +563,9 @@
 
     $('#addCatalogsForm').submit(function(event) {
         event.preventDefault();
+        var content = tinymce.get('content').getContent();
+        $('#content').val(content);
+
         var formData = new FormData(this);
         if ($('#image')[0].files.length > 0) {
             var imageFile = $('#image')[0].files[0];
@@ -623,6 +634,7 @@
         fetchCategoriesForEdit();
         $('.alert-danger').html('');
         $('#catalog_id').val(id);
+       
         $.ajax({
             type: "GET",
             url: "{{ url('/catalogs/edit') }}" + '/' + id,
@@ -633,7 +645,10 @@
                     $('#editCatalogs').modal('show');
                     $('#edit_name').val(res.catalogs.name);
                     $('#edit_title').val(res.catalogs.title);
-                    $('#edit_content').val(res.catalogs.content);
+
+                    tinymce.get('edit_content').setContent(res.catalogs.content);
+                    //$('#edit_content').val(res.catalogs.content);
+
                     $('#edit_sku').val(res.catalogs.sku);
                     $('#edit_base_price').val(res.catalogs.base_price);
                     $('#edit_status option[value="' + res.catalogs.status + '"]').attr('selected','selected');
@@ -674,6 +689,8 @@
         id = $('#catalog_id').val();
         event.preventDefault();
         // var imageFile = $('#edit_image')[0].files[0];
+        var content = tinymce.get('edit_content').getContent();
+        $('#edit_content').val(content);
         var formData = new FormData(this);
         // Check if an image file is selected
         if ($('#edit_image')[0].files.length > 0) {
@@ -682,26 +699,54 @@
         }
         // formData.append('image',imageFile);
         $.ajax({
-            type: "POST",
-            url: `{{ route('catalogs.update', ['catalog' => ':id']) }}`.replace(':id', id),
-            data: formData,
-            dataType: 'json',
-            processData: false,
-            contentType: false,
-            success: function(res) {
-                if (res.errors) {
-                    $('.alert-danger').html('');
-                    $.each(res.errors, function(key, value) {
-                        $('.alert-danger').show();
-                        $('.alert-danger').append('<li>' + value + '</li>');
-                    })
-                } else {
-                    $('.alert-danger').html('');
-                    $("#editCatalogs").modal('hide');
-                    location.reload();
-                }
-            }
-        });
+    type: "POST",
+    url: `{{ route('catalogs.update', ['catalog' => ':id']) }}`.replace(':id', id),
+    data: formData,
+    dataType: 'json',
+    processData: false,
+    contentType: false,
+    success: function(res) {
+   
+        if (res.errors) {
+            $('.alert-danger').html('');
+            // $.each(res.errors, function(key, value) {
+            //     console.log(value);
+            //     $('.alert-danger').show();
+            //     $('.alert-danger').append('<li>' + value + '</li>');
+            // })
+        } else {
+            $('.alert-danger').html('');
+            $("#editCatalogs").modal('hide');
+            location.reload();
+        }
+    },
+    error: function(xhr, status, error) {
+    console.error('Error:', error);
+
+    try {
+        var errors = JSON.parse(xhr.responseText);
+        if (errors && errors.errors) {
+            $('.alert-danger').html('');
+            $.each(errors.errors, function(key, value) {
+               
+                $('.alert-danger').show();
+                $('.alert-danger').append('<li>' + value + '</li>');
+            });
+        } else {
+            // If there are no specific error messages returned in the response
+            $('.alert-danger').html('An error occurred while processing your request. Please try again later.');
+            $('.alert-danger').show();
+        }
+    } catch (e) {
+        // If the response is not in JSON format or cannot be parsed
+        console.error('Error parsing response:', e);
+        $('.alert-danger').html('An unexpected error occurred. Please try again later.');
+        $('.alert-danger').show();
+    }
+}
+
+});
+
     });
 
 
@@ -858,8 +903,28 @@ $(document).on("click", '#export_csv', function(){
     }
     </script>
 
+ <script src="https://cdn.tiny.cloud/1/0dav8na2f2kt1ffcyc1zmxhyohcbkjxfji99bcvl4xevhk0n/tinymce/7/tinymce.min.js" referrerpolicy="origin"></script>
 
+ <script>
+ tinymce.init({
+    selector: 'textarea',
+    setup: function (editor) {
+        editor.on('init', function () {
+            // Editor is initialized, now bind the form submission
+            document.getElementById('addCatalogsForm').addEventListener('submit', function() {
+                var content = tinymce.get('content').getContent();
+                document.getElementById('content').value = content;
+            });
+        });
+    }
+});
+</script>
+<script>
 
+setTimeout(function() {
+    $('#url_msg').fadeOut('fast');
+}, 5000); 
 
+</script>
 
 @endsection
