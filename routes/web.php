@@ -48,7 +48,6 @@ Route::group(['middleware' => ['auth']], function() {
         Route::post('/catalogs/{catalog}',[CatalogController::class,'update'])->name('catalogs.update');
         Route::delete('/catalogs/delete/{catalog}',[CatalogController::class,'destroy'])->name('catalogs.destroy');
         Route::get('/catalog/{id}',[CatalogController::class,'show'])->name('catalogs.show');
-
         Route::get('/pending-catalogs', [PendingCatalogs::class,'index'])->name('pending-catalogs.index');
         Route::post('/pending-catalogs/add/',[PendingCatalogs::class,'store']);
         Route::get('/pending-catalogs/edit/{id}',[PendingCatalogs::class,'edit'])->name('pending-catalogs.edit');
@@ -69,13 +68,15 @@ Route::group(['middleware' => ['auth']], function() {
     Route::get('logout', [AuthController::class, 'logOut'])->name('logout');
     // User count api
     Route::post('get_user_data/{id}', [CatalogController::class, 'get_user_data']);
+    Route::get('catalogs-sync', [CatalogController::class, 'catalogs_sync'])->name('catalogs-sync.index');
+    
+    Route::post('show_pro_his', [CatalogController::class, 'show_pro_his']);
 });
 //Authenticated Group Routes Ends
 
-Route::post('show_pro_his', [CatalogController::class, 'show_pro_his']);
 
 Route::get('testing_api', [CatalogController::class, 'testing_api']);
-Route::get('catalogs-sync', [CatalogController::class, 'catalogs_sync']);
 
+Route::post('catalogsync', [CatalogController::class, 'catalogs_sync']);
 
 

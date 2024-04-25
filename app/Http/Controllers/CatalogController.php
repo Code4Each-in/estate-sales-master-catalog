@@ -721,7 +721,7 @@ class CatalogController extends Controller
 public function show_pro_his(Request $req)
 {   
    // dd($req->all());
-    $id = $req->cata_id;
+    $id = $req->cata_id; 
     $client = new Client(); 
     $apiUrl = rtrim(env('WORDPRESS_URL'), '/') . '/wp-json/custom/v3/orders_by_master_catalog?master_catalog_id='.$id;
     $response = $client->request('GET', $apiUrl, ['verify' => false]);
@@ -770,12 +770,55 @@ public function testing_api()
     }
 }
 
-public function catalogs_sync()
+
+
+
+public function catalogs_sync(Request $request)
 {
-    return view('catalogs-sync.index');
-}
-
-
    
+    if (request()->ajax()) {
+        try {
+            $client = new Client();
+            $page = $request->input('draw');
+        
+           
+            $response = $client->request('GET', "https://staging.recollection.com/wp-json/custom/v3/products-without-master-catalog?page=$page&per_page=10", ['verify' => false]);
+            
+
+            if ($response->getStatusCode() === 200) {
+                $data = json_decode($response->getBody(), true);
+
+                if ($data !== null && isset($data['data'])) {
+                    $result = $data['data'];
+                    $totalItems = $data['total_count'];
+
+                    // Pagination
+                    $start = request()->input('start', 0);
+                    $length = request()->input('length', 10);
+                    $result = array_slice($result, $start, $length);
+
+                    return response()->json([
+                        'data' => $result,
+                        'draw' => request()->input('draw', 1),
+                        'recordsTotal' => $totalItems,
+                        'recordsFiltered' => $totalItems,
+                    ]);
+                } else {
+                    // Unexpected data format
+                    return response()->json(['error' => 'Unexpected data format'], 500);
+                }
+            } else {
+                // API request failed
+                return response()->json(['error' => 'API request failed'], $response->getStatusCode());
+            }
+        } catch (\Exception $e) {
+            // Exception occurred
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    } else {
+        // Non-AJAX request, return view
+        return view('catalogs-sync.index');
+    }
+}
 
 }
