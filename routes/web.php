@@ -76,7 +76,10 @@ Route::group(['middleware' => ['auth']], function() {
 
 
 Route::get('testing_api', [CatalogController::class, 'testing_api']);
+Route::get('getCatlogs', [CatalogController::class, 'getCatlogs']);
 
-Route::post('catalogsync', [CatalogController::class, 'catalogs_sync']);
+Route::get('catalogData', [CatalogController::class, 'catalogData']);
+Route::post('assignCatalog', [CatalogController::class, 'assignCatalog']);
+
 
 
