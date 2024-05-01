@@ -214,4 +214,6 @@ class UsersController extends Controller
         session()->flash('message','User Deleted successfully.');
         return response()->json(['success' => true]);
     }
+
+   
 }

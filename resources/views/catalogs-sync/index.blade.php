@@ -4,15 +4,22 @@
 @section('content')
 
 
+<div id="hide_sess">@if(Session::has('cata_added'))
+<p class="alert alert-info">{{ Session::get('cata_added') }}</p>
+   @endif
+</div>
+<div  id="catalog_success">
 
+</div>
+
+<div  id="check_error">
+
+</div>
 <body>
     <button class="btn btn-default my-3" onClick="assign_model()">Assign</button>
     <button class="btn btn-default my-3" onClick="openCatalogModal()" href="javascript:void(0)">Add Catalog</button>
     <button class="btn btn-default my-3" id="fetchBtn"  href="javascript:void(0)">Fetch</button>
 </body>
-
-
-<!-- <button class="btn btn-default my-3" onClick="assign_model()" href="javascript:void(0)">ASSIGN</button> -->
 
 <section class="section catalog">
     <div class="row">
@@ -25,6 +32,7 @@
                             <table class="datatable table table-striped my-2" id="catalogs_table">
                                 <thead>
                                     <tr>
+                                       <th scope="col">Action</th>
                                         <th scope="col">ID</th>
                                         <th scope="col">Title</th>
                                         <th scope="col">Base Price</th>
@@ -33,7 +41,7 @@
                                         <th scope="col">User Count</th>
                                         <th scope="col">Image</th>
                                         <th scope="col">Status</th>
-                                        <th scope="col">Action</th>
+                                   
 
                                     </tr>
                                 </thead>
@@ -46,7 +54,7 @@
 
                 </div>
             </div>
-        </div>
+        </div>  
     </div>
            <!--start: Add users Modal -->
            <div class="modal fade" id="assign_model" tabindex="-1" aria-labelledby="role" aria-hidden="true">
@@ -54,10 +62,10 @@
                             <div class="modal-content">
                                 <div class="modal-header">
                                     <h5 class="modal-title" id="role">Assign Catalog</h5>
-                                   
+                                    <p class="alert alert-info">Because of Domain Issue we cannot assign Products</p>
                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
-                                <form id="addCatalogsForm" action= "{{ url('assignCatalog') }}" method="post">
+                                <form  action= "{{ url('assignCatalog') }}" method="post">
                                     @csrf
                                     <div class="modal-body">
                                         <div class="alert alert-danger" style="display:none"></div>
@@ -82,7 +90,7 @@
                                     </div>
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                        <button type="submit" class="btn btn-default">Save</button>
+                                        <button type="submit" class="btn btn-default"  disabled>Save</button>
                                     </div>
                                 </form>
                             </div>
@@ -98,16 +106,19 @@
                             <div class="modal-content">
                                 <div class="modal-header">
                                     <h5 class="modal-title" id="role">Add Catalog</h5>
+                                    <p class="alert alert-info">Because of Domain Issue we cannot Add Products</p>
                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
-                                <form id="addCatalogsForm">
+                                <form id="addCatalogsForm"  >
                                     @csrf
-                                    <div id="check_box">
-                                    <!-- <label for="vehicle2"> I have a car</label><br>
-                                    <input type="checkbox" name="vehicle3" value="Boat" checked> -->
-                                    </div>
                                     <div class="modal-body">
                                         <div class="alert alert-danger" style="display:none"></div>
+                                        <div class="row mb-3 mt-4">
+                                            <label for="title" class="col-sm-3 col-form-label required">Products</label>
+                                            <div class="col-sm-9" id="check_box">
+                                              
+                                            </div>
+                                        </div>
                                         <div class="row mb-3 mt-4">
                                             <label for="title" class="col-sm-3 col-form-label required">Title</label>
                                             <div class="col-sm-9">
@@ -115,11 +126,10 @@
                                             </div>
                                         </div>
                                         <div class="row mb-3">
-
                                             <label for="content" class="col-sm-3 col-form-label required">Description</label>
                                             <div class="col-sm-9">
                                                 <textarea class="form-control" name="content" style="height: 100px" id="content"></textarea>
-                                                <!-- <textarea id="myTextarea" name="content"></textarea> -->
+                                             
                                             </div>
                                         </div>
                                   
@@ -130,7 +140,7 @@
                                                 <select name="category" class="form-select" id="category">
                                                     <option value="">Select Category</option>
                                                 </select>
-                                                <!-- <input type="text" class="form-control" name="category" id="category"> -->
+                                               
                                             </div>
                                         </div>
                                         <div class="row mb-3 mt-4">
@@ -145,12 +155,6 @@
                                                 <input type="number" class="form-control" name="base_price" id="base_price" step=".01">
                                             </div>
                                         </div>
-                                        <!-- <div class="row mb-3 mt-4">
-                                            <label for="image" class="col-sm-3 col-form-label">Image</label>
-                                            <div class="col-sm-9">
-                                                <input type="file" class="form-control" name="image" id="image">
-                                            </div>
-                                        </div> -->
                                      
                                         <div class="row mb-3">
                                             <label for="status" class="col-sm-3 col-form-label required">Status</label>
@@ -192,19 +196,19 @@
                                         <div class="row mb-3 mt-4">
                                             <label for="dimensions" class="col-sm-3 col-form-label ">Dimensions (in)</label>
                                             <div class="col-sm-3">
-                                                <input type="number" class="form-control" name="length" id="length" placeholder="Length">
+                                                <input type="text" class="form-control" name="length" id="length" placeholder="Length">
                                             </div>
                                             <div class="col-sm-3">
-                                                <input type="number" class="form-control" name="width" id="width" placeholder="Width">
+                                                <input type="text" class="form-control" name="width" id="width" placeholder="Width">
                                             </div>
                                             <div class="col-sm-3">
-                                                <input type="number" class="form-control" name="height" id="height" placeholder="Height">
+                                                <input type="text" class="form-control" name="height" id="height" placeholder="Height">
                                             </div>
                                         </div>
                                     </div>
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                        <button type="submit" class="btn btn-default">Save</button>
+                                        <button type="submit" class="btn btn-default" disabled>Save</button>
                                     </div>
                                 </form>
                             </div>
@@ -226,7 +230,11 @@
     $(document).ready(function() {
         $('#catalogs_table').DataTable({
             processing: true,
+
+
             serverSide: true,
+            searchDelay: 3000 ,
+            
             ajax: {
                 url: "{{ route('catalogs-sync.index') }}",
                 type: "get",
@@ -241,6 +249,15 @@
             pageLength: 10,
             searching: true,
             aoColumns: [
+                {
+                        data: 'Action',
+                        width: "20%",
+                        render: function(data, type, row) {
+                        // Assuming there's some logic here to determine the value of isChecked
+                        var isChecked = row.isChecked ? 'checked' : ''; // Example: Checking the checkbox based on some condition
+                        return '<input type="checkbox" name="pro_id[]" value="'+row.id+'">';
+                    }
+                },
                 {
                         data: 'id',
                         width: "20%",
@@ -303,16 +320,8 @@
                             return '<span class="badge rounded-pill bg-success">Publish</span>';
                         }   
                     }
-                },
-                {
-                        data: 'Action',
-                        width: "20%",
-                        render: function(data, type, row) {
-                        // Assuming there's some logic here to determine the value of isChecked
-                        var isChecked = row.isChecked ? 'checked' : ''; // Example: Checking the checkbox based on some condition
-                        return '<input type="checkbox" name="pro_id[]" value="'+row.id+'">';
-                    }
                 }
+                
             ]
         });
     });
@@ -320,68 +329,79 @@
 
 <script>
     var checkedValues = [];
-   function assign_model() {
-   
-   
-    $("#append_pro").empty();
-    $('input[name="pro_id[]"]:checked').each(function() {
-        var checkboxValue = $(this).val();
-        checkedValues.push($(this).val());
-        console.log(checkedValues);
-        var productName = $(this).closest('tr').find('td:eq(1)').text(); 
-        var price = $(this).closest('tr').find('td:eq(2)').text(); 
-       // alert(price);
-        // Append checkbox with label and name
-        $("#append_pro").append('<label><input type="checkbox" checked name="products[]" value="' + checkboxValue + '">' + productName + '</label>');
-    });
 
-        var vdata = { pro_id: checkedValues };
-        console.log(vdata);
-      
-       $.ajax({
-         url: "{{ url('getCatlogs')}}",
-         type:"get",
-         dataType: "json",
-         success: function(data){
-            $.each(data, function(key, val) {
-            // console.log(val.id);
-            $("#append_Catalogs").append('<option value=' + val.id + '>' + val.title + '</option>');
-            });
-               $('#assign_model').modal('show');
-         }
-       });
-     
+    function assign_model() {
+        // Check if any checkbox is checked
+        if ($('input[name="pro_id[]"]:checked').length === 0) {
+            $('#check_error').html("Please select at least one Checkbox.").addClass('alert alert-danger');
+            return; 
+        }
+        $('#check_error').html("").removeClass('alert alert-danger');
+        $("#append_pro").empty();
+        $('input[name="pro_id[]"]:checked').each(function() {
+            var checkboxValue = $(this).val();
+            checkedValues.push($(this).val());
+            var productName = $(this).closest('tr').find('td:eq(2)').text();
+        
+           var checkbox = $('<input>', {
+                type: 'checkbox',
+                checked: 'checked',
+                name: 'products[]',
+                value: checkboxValue
+            }).css('display', 'none');
+            var label = $('<label>').text(productName);
+            if ($("#append_pro input[type='checkbox']").length > 0) {
+        $("#append_pro").append(', ');
     }
-    </script>
+
+           $("#append_pro").append(checkbox, label);
+        });
+
+        $.ajax({
+            url: "{{ url('getCatlogs')}}",
+            type:"get",
+            dataType: "json",
+            success: function(data){
+                $.each(data, function(key, val) {
+                    $("#append_Catalogs").append('<option value=' + val.id + '>' + val.title + '</option>');
+                });
+                $('#assign_model').modal('show');
+            }
+        });
+    }
+</script>
+
 
     <script>
-       
-       function openCatalogModal() {
-        var onecheckboxdata = [];
-        var allcheckboxdata = [];
-        $("#append_pro").empty();
-        var firstCheckboxPrice = null; 
-        $('input[name="pro_id[]"]:checked').each(function(index) {
-            var checkboxValue = $(this).val();
-            var productName = $(this).closest('tr').find('td:eq(1)').text();
-           // alert(checkboxValue);
-            pro_data  = {
-                "id": checkboxValue,
-                "name" : productName
-            }
-            allcheckboxdata.push(pro_data);
+function openCatalogModal() {
+    var onecheckboxdata = [];
+    var allcheckboxdata = [];
+    var atLeastOneChecked = false; // Flag to check if at least one checkbox is checked
+
+    $("#append_pro").empty();
+    
+    $('input[name="pro_id[]"]:checked').each(function(index) {
+        atLeastOneChecked = true; // Set the flag to true if at least one checkbox is checked
+        
+        var checkboxValue = $(this).val();
+        var productName = $(this).closest('tr').find('td:eq(2)').text();
+        var pro_data = {
+            "id": checkboxValue,
+            "name": productName
+        };
+        allcheckboxdata.push(pro_data);
+
         if (index === 0) {
             var checkboxValue = $(this).val();
-            var productName = $(this).closest('tr').find('td:eq(1)').text(); 
-            var price = $(this).closest('tr').find('td:eq(2)').text(); 
-            var sku = $(this).closest('tr').find('td:eq(3)').text(); 
-            var publiish_date = $(this).closest('tr').find('td:eq(4)').text(); 
+            var productName = $(this).closest('tr').find('td:eq(1)').text();
+            var price = $(this).closest('tr').find('td:eq(2)').text();
+            var sku = $(this).closest('tr').find('td:eq(3)').text();
+            var publiish_date = $(this).closest('tr').find('td:eq(4)').text();
             var image = $(this).closest('tr').find('td:eq(6) img').attr('src');
-            var status = $(this).closest('tr').find('td:eq(7)').text(); 
-            firstCheckboxPrice = price; 
+            var status = $(this).closest('tr').find('td:eq(7)').text();
             var productData = {
                 id: checkboxValue,
-                price:price,
+                price: price,
                 productName: productName,
                 sku: sku,
                 publiish_date: publiish_date,
@@ -389,73 +409,77 @@
                 status: status
             };
             onecheckboxdata.push(productData);
-          
-             allpreFieldData(onecheckboxdata, allcheckboxdata);
-           // return false;
         }
     });
-    
-    function allpreFieldData(onecheckboxdata,allcheckboxdata){
-    console.log(allcheckboxdata);
-       id  = onecheckboxdata[0].id;
-       vdata = {id:id};
-        $.ajax({
-         url: "{{ url('catalogData')}}",
-         type:"get",
-         data:vdata,
-         dataType: "json",
-         success: function(data){
-            
-            id = data.data.id;
-            name = data.data.name;
-            status = data.data.status;
-            description = data.data.short_description;
-            sku = data.data.sku;
-            price = data.data.price;
-            weight = data.data.weight;
-            sale_price = data.data.sale_price;
-            length = data.data.dimensions.length;
-            width = data.data.dimensions.width;
-            height = data.data.dimensions.height;
 
-            document.getElementById("title").value = name;
-            document.getElementById("content").value = description;
-            document.getElementById("sku").value = sku;
-            document.getElementById("base_price").value = price;
-            document.getElementById("weight").value = weight;
-            document.getElementById("sale_price").value = sale_price;
-            document.getElementById("length").value = length;
-            document.getElementById("width").value = width;
-            document.getElementById("height").value = height;
-            document.getElementById("status").value = status;
-            allcheckboxdata.forEach(function(item) {
-    // Create a checkbox element
+    if (!atLeastOneChecked) {
+        // If no checkbox is checked, display an alert
+        $('#check_error').html("Please select at least one Checkbox.").addClass('alert alert-danger');
+        return; // Exit the function without opening the modal
+    }else{
+        $('#check_error').html("").removeClass('alert alert-danger');
+        allpreFieldData(onecheckboxdata, allcheckboxdata);
+    }
+
+
+   
+}
+
+function allpreFieldData(onecheckboxdata, allcheckboxdata) {
+    var id = onecheckboxdata[0].id;
+    var vdata = { id: id };
     
-    var container = document.getElementById("check_box");
+    $.ajax({
+        url: "{{ url('catalogData')}}",
+        type: "get",
+        data: vdata,
+        dataType: "json",
+        success: function(data) {
+            // Populate modal fields with data received from AJAX response
+            document.getElementById("title").value = data.data.name;
+            document.getElementById("content").value = data.data.short_description;
+            document.getElementById("sku").value = data.data.sku;
+            document.getElementById("base_price").value = data.data.price;
+            document.getElementById("weight").value = data.data.weight;
+            document.getElementById("sale_price").value = data.data.sale_price;
+            document.getElementById("length").value = parseFloat(data.data.dimensions.length);
+            document.getElementById("width").value = parseFloat(data.data.dimensions.width);
+            document.getElementById("height").value = parseFloat(data.data.dimensions.height);
+            document.getElementById("status").value = data.data.status;
+
+            // Populate checkboxes in the modal with data from allcheckboxdata
+            var container = document.getElementById("check_box");
+            container.innerHTML = ''; // Clear existing checkboxes
+
+            allcheckboxdata.forEach(function(item, index) {
     var checkbox = document.createElement('input');
     checkbox.type = 'checkbox';
-    checkbox.id = item.id; // Set the id attribute
-    // Set the label text
+    checkbox.id = item.id;
+    checkbox.value = item.id;
+    checkbox.name = 'products[]';
+    checkbox.checked = true;
+    checkbox.style.display = 'none'; // Hide the checkbox
+
     var label = document.createElement('label');
     label.htmlFor = item.id;
     label.appendChild(document.createTextNode(item.name));
 
-    // Append the checkbox and label to the container element
     container.appendChild(checkbox);
     container.appendChild(label);
-    container.appendChild(document.createElement('br')); // Add line break for separation
+
+    if (index < allcheckboxdata.length - 1) { // Append comma if not the last item
+        container.appendChild(document.createTextNode(', '));
+    }
+
+    container.appendChild(document.createElement('br'));
 });
 
 
 
-              $('#addCatalog').modal('show');
-             
-         }
-       });
-    
-    
-    }
-     
+            // Show the modal
+            $('#addCatalog').modal('show');
+        }
+    });
 }
 
         </script>
@@ -465,6 +489,66 @@
         window.location.reload();
     });
 </script>
+
+<script>
+    $('#addCatalogsForm').submit(function(event) {
+        event.preventDefault();
+        // var content = tinymce.get('content').getContent();
+        // $('#content').val(content);
+
+        var formData = new FormData(this);
+        // if ($('#image')[0].files.length > 0) {
+        //     var imageFile = $('#image')[0].files[0];
+        //     formData.append('image', imageFile);
+        // }
+        $.ajax({
+            type: 'POST',
+            url: "{{ url('/addCatalog')}}",
+            data: formData,
+            cache: false,
+            processData: false,
+            contentType: false,
+            success: function(data) {
+                if (data.errors) {
+                    displayErrors(data.errors); 
+                } else {
+                    $('.alert-danger').hide().html('');
+                    $("#addCatalog").modal('hide');
+                   var data = JSON.parse(data);
+                 
+                   
+                   $('#hide_sess').hide();
+                   $('#catalog_success').html(data.message).addClass('alert alert-info');
+                   setTimeout(function(){
+                    location.reload(); 
+                }, 3000); 
+                   // location.reload();
+                }
+            },
+            error: function(xhr, textStatus, errorThrown) { 
+                if (xhr.status === 422) {
+                    var errorResponse = xhr.responseJSON;
+                    if (errorResponse && errorResponse.errors) {
+                        displayErrors(errorResponse.errors);
+                        return;
+                    }
+                }
+                displayError('An error occurred while processing your request. Please try again later.');
+            }
+        });
+
+    });
+    function displayErrors(errors) {
+        // Clear previous errors
+        $('.alert-danger').html('');
+        // Display each error
+        $.each(errors, function(key, value) {
+            $('.alert-danger').append('<li>' + value + '</li>');
+        });
+        // Show the error container
+        $('.alert-danger').show();
+    }
+    </script>
 
 
 

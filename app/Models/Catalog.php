@@ -20,6 +20,13 @@ class Catalog extends Model
         'base_price',
         'status',
         'image',
-        'publish_date'
+        'publish_date',
+        'weight',
+        'color',
+        'sale_price',
+        'brand',
+        'length',
+        'width',
+        'height'
     ];
 }
