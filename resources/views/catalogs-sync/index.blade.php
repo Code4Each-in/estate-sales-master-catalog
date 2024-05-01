@@ -62,7 +62,7 @@
                             <div class="modal-content">
                                 <div class="modal-header">
                                     <h5 class="modal-title" id="role">Assign Catalog</h5>
-                                   
+                                    <p class="alert alert-info">Because of Domain Issue we cannot assign Products</p>
                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
                                 <form  action= "{{ url('assignCatalog') }}" method="post">
@@ -90,7 +90,7 @@
                                     </div>
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                        <button type="submit" class="btn btn-default">Save</button>
+                                        <button type="submit" class="btn btn-default"  disabled>Save</button>
                                     </div>
                                 </form>
                             </div>
@@ -106,6 +106,7 @@
                             <div class="modal-content">
                                 <div class="modal-header">
                                     <h5 class="modal-title" id="role">Add Catalog</h5>
+                                    <p class="alert alert-info">Because of Domain Issue we cannot Add Products</p>
                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
                                 <form id="addCatalogsForm"  >
@@ -207,7 +208,7 @@
                                     </div>
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                        <button type="submit" class="btn btn-default">Save</button>
+                                        <button type="submit" class="btn btn-default" disabled>Save</button>
                                     </div>
                                 </form>
                             </div>
