@@ -9,12 +9,14 @@ use App\Models\Catalog;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Exception\GuzzleException;
+
 
 class CatalogController extends Controller
 {
@@ -698,7 +700,7 @@ class CatalogController extends Controller
 
     public function show_pro_his(Request $req)
     {
-        // dd($req->all());
+       
         $id = $req->cata_id;
         $client = new Client();
         $apiUrl = rtrim(env('WORDPRESS_URL'), '/') . '/wp-json/custom/v3/orders_by_master_catalog?master_catalog_id=' . $id;
@@ -752,31 +754,39 @@ class CatalogController extends Controller
 
     public function catalogs_sync(Request $request)
     {
-      
         if (request()->ajax()) {
             try {
                 $page = request()->input('draw');
                 $client = new Client();
-                $response = $client->request('GET', "https://staging.recollection.com/wp-json/custom/v3/products-without-master-catalog?page=$page&per_page=10", ['verify' => false]);
+    
+                if ($request->has('search')) {
+                    $searchTerm = $request->input('search');
+                    $response = $client->request('GET', "https://staging.recollection.com/wp-json/custom/v3/products-without-master-catalog?search=$searchTerm", ['verify' => false]);
+                } else {
+                    $page = $request->input('draw', 1);
+                    $response = $client->request('GET', "https://staging.recollection.com/wp-json/custom/v3/products-without-master-catalog?page=$page&per_page=10", ['verify' => false]);
+                }
+    
                 if ($response->getStatusCode() === 200) {
                     $data = json_decode($response->getBody(), true);
-
+    
                     if ($data !== null && isset($data['data'])) {
                         $result = $data['data'];
                         $totalItems = $data['total_count'];
                         $start = request()->input('start', 0);
                         $length = request()->input('length', 10);
-                        
-
-                        return response()->json([
-                            'data' => $result,
-                            'draw' => request()->input('draw', 1),
-                            'recordsTotal' => $totalItems,
-                            'recordsFiltered' => $totalItems
-                        ]);
                     } else {
-                        return response()->json(['error' => 'Unexpected data format'], 500);
+                        // Return an empty array if no data is found
+                        $result = [];
+                        $totalItems = 0;
                     }
+    
+                    return response()->json([
+                        'data' => $result,
+                        'draw' => request()->input('draw', 1),
+                        'recordsTotal' => $totalItems,
+                        'recordsFiltered' => $totalItems
+                    ]);
                 } else {
                     return response()->json(['error' => 'API request failed'], $response->getStatusCode());
                 }
@@ -787,6 +797,7 @@ class CatalogController extends Controller
             return view('catalogs-sync.index');
         }
     }
+    
 
     public function getCatlogs()
     {
@@ -841,10 +852,137 @@ class CatalogController extends Controller
         }
     }
 
-    public function assignCatalog(Request $req)
+   
+
+public function assignCatalog(Request $req)
+{
+    $catalog_id = $req->catalog;
+    $products = $req->products;
+    $all_pro = implode(',', $products);
+   
+
+
+    // Authentication credentials
+    $consumer_key = 'ck_cc99edc37f4e0b1a8f1e34864259991df0e41fea';
+    $consumer_secret = 'cs_cb4a6cfa35725212be33ab6d057aa22c6082c5a9';
+
+    // API endpoint
+    $api_endpoint = 'https://staging.recollection.com/wp-json/custom/v3/assign-master-catalog';
+
+ 
+    $payload = [
+        'master-catalog-id' => $catalog_id,
+        'products' => $products
+    ];
+    $client = new Client();
+    try {
+        $response = $client->post($api_endpoint, [
+            'auth' => [$consumer_key, $consumer_secret],
+            'json' => $payload,
+            'verify' => false, 
+        ]);
+
+        // Check if the response is successful
+        if ($response->getStatusCode() == 200) {
+           // return $response->getBody()->getContents();
+           // return redirect()->route('catalogs-sync.index');
+            return redirect()->route('catalogs-sync.index')->with('cata_added', 'Master Catalog Assigned to Products successfully.');
+        } else {
+            return response()->json(['error' => 'API request failed', 'status' => $response->getStatusCode()], $response->getStatusCode());
+        }
+    } catch (\Exception $e) {
+        return response()->json(['error' => 'API request failed: ' . $e->getMessage()], 500);
+    }
+}
+
+
+    public function addCatalog(AddCatalog $request)
     {
-        dd($req->products);
+        //Request Data validation
+        $validatedData = $request->validated();
+        $catalog = Catalog::create([
+            'author_id' => auth()->user()->id,
+            // 'name' => $validatedData['title'],
+            'title' => $validatedData['title'],
+            'content' => $validatedData['content'],
+            'wp_category_id' => $validatedData['category'],
+            'sku' => $validatedData['sku'],
+            'base_price' => $validatedData['base_price'],
+            'status' => $validatedData['status'],
+            'publish_date' => $validatedData['status'] == 'publish' ? now() : null,
+            'created_at' => now(),
+            'updated_at' => now(),
+            'weight' => $validatedData['weight'],
+            'color' => $validatedData['color'],
+            'sale_price' => $validatedData['sale_price'],
+            'brand' => $validatedData['Brand'],
+            'length' => $validatedData['length'],
+            'width' => $validatedData['width'],
+            'height' => $validatedData['height'],
+        ]);
+
+   
+        //------------------------------------------------
+ // Authentication credentials
+ $consumer_key = 'ck_cc99edc37f4e0b1a8f1e34864259991df0e41fea';
+ $consumer_secret = 'cs_cb4a6cfa35725212be33ab6d057aa22c6082c5a9';
+
+ // API endpoint
+ $api_endpoint = 'https://staging.recollection.com/wp-json/custom/v3/assign-master-catalog';
+
+
+ $payload = [
+     'master-catalog-id' => $catalog->id,
+     'products' => $request->products
+ ];
+ $client = new Client();
+ try {
+     $response = $client->post($api_endpoint, [
+         'auth' => [$consumer_key, $consumer_secret],
+         'json' => $payload,
+         'verify' => false, // Disable SSL verification (only for development)
+     ]);
+
+     // Check if the response is successful
+     if ($response->getStatusCode() == 200) {
+        return $response->getBody()->getContents();
+        // return redirect()->route('catalogs-sync.index');
+        // return redirect()->route('catalogs-sync.index')->with('cata_added', 'Master Catalog Assigned to Products successfully.');
+     } else {
+         return response()->json(['error' => 'API request failed', 'status' => $response->getStatusCode()], $response->getStatusCode());
+     }
+ } catch (\Exception $e) {
+     return response()->json(['error' => 'API request failed: ' . $e->getMessage()], 500);
+ }
+        //------------------------------------------------
+
+    }
+
+    public function pro_not_assigned()
+    {
+        DB::enableQueryLog();
+        $value = "Century";
+        $result =   DB::table('wp_posts')
+                 ->where('post_title', 'LIKE', '%' . $value . '%')    
+                 ->where('post_type', "product")
+                 ->get();
+                
+               
+                $ids = $result->pluck('ID')->toArray();
+                DB::enableQueryLog();
+                $data =   DB::table('wp_postmeta')
+                        ->whereIn('post_id', $ids)
+                        ->where('meta_key', 'master-catalog-id')
+                        ->where('meta_value', '!=', null)
+                        ->get();
+                 
+                    $meta_ids = $data->pluck('meta_id')->toArray();
+                   
+
+                       
+     }
+        // return view('catalogs-sync.product_not_assigned');
     }
     
     
-}
+

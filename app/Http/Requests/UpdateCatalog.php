@@ -24,12 +24,18 @@ class UpdateCatalog extends FormRequest
         return [
             'title' => 'required|string|max:255',
             'content' => 'required|string',
-            'category' => 'nullable',
-            // 'name' => 'required|string|max:255',
+            'category' => 'nullable', 
             'sku' => 'nullable|string',
             'base_price' => 'required',
             'status' => 'required',
             'image' => 'nullable|file|mimes:jpg,png,jpeg,gif,heic,heif,hevc',
+            'weight' => 'nullable',
+            'color' => 'nullable',
+            'sale_price' => 'nullable',
+            'editBrand' => 'nullable',
+            'length' => 'nullable',
+            'width' => 'nullable',
+            'height'=> 'nullable',
         ];
     }
 }

@@ -71,15 +71,18 @@ Route::group(['middleware' => ['auth']], function() {
     Route::get('catalogs-sync', [CatalogController::class, 'catalogs_sync'])->name('catalogs-sync.index');
     
     Route::post('show_pro_his', [CatalogController::class, 'show_pro_his']);
+    Route::get('testing_api', [CatalogController::class, 'testing_api']);
+    Route::get('getCatlogs', [CatalogController::class, 'getCatlogs']);
+
+    Route::get('catalogData', [CatalogController::class, 'catalogData']);
+    Route::post('assignCatalog', [CatalogController::class, 'assignCatalog']);
+    Route::post('addCatalog', [CatalogController::class, 'addCatalog']);
+    Route::get('not-assigned', [CatalogController::class, 'pro_not_assigned']);
 });
 //Authenticated Group Routes Ends
 
 
-Route::get('testing_api', [CatalogController::class, 'testing_api']);
-Route::get('getCatlogs', [CatalogController::class, 'getCatlogs']);
 
-Route::get('catalogData', [CatalogController::class, 'catalogData']);
-Route::post('assignCatalog', [CatalogController::class, 'assignCatalog']);
 
 
 

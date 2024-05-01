@@ -30,6 +30,13 @@ class AddCatalog extends FormRequest
             'base_price' => 'required',
             'status' => 'required',
             'image' => 'nullable|file|mimes:jpg,png,jpeg,gif,heic,heif,hevc',
+            'weight' => 'nullable',
+            'color' => 'nullable',
+            'sale_price' => 'nullable',
+            'Brand' => 'nullable',
+            'length' => 'nullable',
+            'width' => 'nullable',
+            'height'=> 'nullable',
         ];
     }
 }

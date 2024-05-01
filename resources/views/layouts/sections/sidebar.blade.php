@@ -46,6 +46,11 @@
               <i class="bi bi-circle"></i><span>Catalogs Sync</span>
             </a>
           </li>
+          <li>
+            <a class="nav-link {{ request()->is('pending-catalogs') ? 'active' : 'collapsed' }}" href="{{ url('/not-assigned') }}">
+              <i class="bi bi-circle"></i><span>Prodcts Not Assigned</span>
+            </a>
+          </li>
         </ul>
       </li>
 
