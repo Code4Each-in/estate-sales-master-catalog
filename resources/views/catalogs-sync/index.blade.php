@@ -90,7 +90,7 @@
                                     </div>
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                        <button type="submit" class="btn btn-default"  disabled>Save</button>
+                                        <button type="submit" class="btn btn-default"  >Save</button>
                                     </div>
                                 </form>
                             </div>
@@ -208,7 +208,7 @@
                                     </div>
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                        <button type="submit" class="btn btn-default" disabled>Save</button>
+                                        <button type="submit" class="btn btn-default" >Save</button>
                                     </div>
                                 </form>
                             </div>
@@ -435,6 +435,7 @@ function allpreFieldData(onecheckboxdata, allcheckboxdata) {
         data: vdata,
         dataType: "json",
         success: function(data) {
+            console.log(data.data.dimensions.length);
             // Populate modal fields with data received from AJAX response
             document.getElementById("title").value = data.data.name;
             document.getElementById("content").value = data.data.short_description;
@@ -442,9 +443,24 @@ function allpreFieldData(onecheckboxdata, allcheckboxdata) {
             document.getElementById("base_price").value = data.data.price;
             document.getElementById("weight").value = data.data.weight;
             document.getElementById("sale_price").value = data.data.sale_price;
-            document.getElementById("length").value = parseFloat(data.data.dimensions.length);
-            document.getElementById("width").value = parseFloat(data.data.dimensions.width);
-            document.getElementById("height").value = parseFloat(data.data.dimensions.height);
+            if (data.data.dimensions.length == '') 
+            {
+                document.getElementById("length").value = '';
+            }else{
+                document.getElementById("length").value = parseFloat(data.data.dimensions.length);
+            }
+            if (data.data.dimensions.width == '') {
+                document.getElementById("width").value = '';
+            }else{
+                document.getElementById("width").value = parseFloat(data.data.dimensions.width);
+            }
+            if (data.data.dimensions.height == '') {
+                document.getElementById("height").value = '';
+            }else{
+                document.getElementById("height").value = parseFloat(data.data.dimensions.height);
+            }
+           
+           
             document.getElementById("status").value = data.data.status;
 
             // Populate checkboxes in the modal with data from allcheckboxdata
@@ -452,13 +468,13 @@ function allpreFieldData(onecheckboxdata, allcheckboxdata) {
             container.innerHTML = ''; // Clear existing checkboxes
 
             allcheckboxdata.forEach(function(item, index) {
-    var checkbox = document.createElement('input');
-    checkbox.type = 'checkbox';
-    checkbox.id = item.id;
-    checkbox.value = item.id;
-    checkbox.name = 'products[]';
-    checkbox.checked = true;
-    checkbox.style.display = 'none'; // Hide the checkbox
+            var checkbox = document.createElement('input');
+            checkbox.type = 'checkbox';
+            checkbox.id = item.id;
+            checkbox.value = item.id;
+            checkbox.name = 'products[]';
+            checkbox.checked = true;
+            checkbox.style.display = 'none'; 
 
     var label = document.createElement('label');
     label.htmlFor = item.id;
@@ -509,6 +525,7 @@ function allpreFieldData(onecheckboxdata, allcheckboxdata) {
             processData: false,
             contentType: false,
             success: function(data) {
+              // console.log(data.errors);
                 if (data.errors) {
                     displayErrors(data.errors); 
                 } else {

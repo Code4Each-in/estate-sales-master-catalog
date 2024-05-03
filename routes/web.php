@@ -27,7 +27,7 @@ Route::get('/reset/password/{token}', [AuthController::class, 'resetPassword']);
 Route::post('/reset/password', [AuthController::class, 'submitResetPasswordForm'])->name('submit.reset.password');   
 
 //Authenticated Group Routes Starts
-Route::group(['middleware' => ['auth']], function() {
+Route::group(['middleware' => ['auth']], function() {  
 
     Route::get('/dashboard',[DashboardController::class,'index'])->name('dashboard');
         
@@ -78,6 +78,7 @@ Route::group(['middleware' => ['auth']], function() {
     Route::post('assignCatalog', [CatalogController::class, 'assignCatalog']);
     Route::post('addCatalog', [CatalogController::class, 'addCatalog']);
     Route::get('not-assigned', [CatalogController::class, 'pro_not_assigned']);
+    Route::post('sbtnotAssigned', [CatalogController::class, 'sbtnotAssigned']);
 });
 //Authenticated Group Routes Ends
 

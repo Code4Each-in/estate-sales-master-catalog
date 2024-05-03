@@ -23,7 +23,7 @@ class AddCatalog extends FormRequest
     {
         return [
             'title' => 'required|string|max:255',
-            'content' => 'required|string',
+            'content' => 'required',
             // 'name' => 'required|string|max:255',
             'category' => 'nullable',
             'sku' => 'nullable|string',
